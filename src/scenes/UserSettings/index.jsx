@@ -18,8 +18,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import useLogin from "../../utils/useLogin";
 import { parse, format } from "date-fns";
 
-//import { debounce } from "../../../../ticket-booking-admin/src/utils/debounce";
-import debounce from "../../utils/debounce";
+//import { debounce } from "../../../../ticket-booking-admin/src/utils/debounce";// vay cai ham nay loi r
+// import debounce from "../../utils/debounce";
 
 
 import * as yup from "yup";
@@ -50,14 +50,14 @@ const initialValues = {
   isEditMode: true, // remove this field when submit
 };
 
-const checkDuplicateEmailDebounced = debounce(
-  userApi.checkDuplicateUserInfo,
-  500
-);
-const checkDuplicatePhoneDebounced = debounce(
-  userApi.checkDuplicateUserInfo,
-  500
-);
+// const checkDuplicateEmailDebounced = debounce(
+//   userApi.checkDuplicateUserInfo,
+//   500
+// );
+// const checkDuplicatePhoneDebounced = debounce(
+//   userApi.checkDuplicateUserInfo,
+//   500
+// );
 
 const userScheme = yup.object().shape({
   username: yup.string().notRequired(),

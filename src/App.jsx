@@ -84,7 +84,7 @@ const App = () => {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <ToastContainer position="bottom-right" />
+        {/* <ToastContainer position="bottom-right" /> */}
         <QueryClientProvider client={queryClient}>
           <div className="app">
             <Sidebar />
