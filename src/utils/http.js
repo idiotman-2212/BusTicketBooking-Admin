@@ -5,7 +5,7 @@ const http = axios.create({
     //baseURL: 'http://35.174.1.161:8080/api/v1/',
 
     //VPS
-    baseURL: 'http://localhost:8080/api/v1/',
+    baseURL: 'http://14.225.253.62:8080/api/v1/',
 
     //local
     //  baseURL: 'http://localhost:8080/api/v1/',
