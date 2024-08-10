@@ -1,3 +1,4 @@
+//giảm thiểu số lần gọi hàm liên tục
 export const debounce = (fn, delay) => {
     let timeoutId;
     return (...args) => {

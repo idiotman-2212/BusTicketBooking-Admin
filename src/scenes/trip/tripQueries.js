@@ -46,8 +46,19 @@ const deleteTrip = async (tripId) => {
 //     return resp.data // true: value of this field can be used, false: info is used by the other
 // }
 
+const checkRecentTrips = async (driverId, departureDateTime) => {
+    const resp = await http.get(`/trips/driver/${driverId}/recent`, {
+      params: {
+        departureDateTime: departureDateTime
+      }
+    });
+    return resp.data;
+  };
+  
+  
+
 export {
     createNewTrip, deleteTrip, getAll, getPageOfTrips,
-    getTrip, updateTrip, findAllTripBySourceAndDest
+    getTrip, updateTrip, findAllTripBySourceAndDest, checkRecentTrips
 };
 

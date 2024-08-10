@@ -31,6 +31,8 @@ import { useQueryString } from "../../utils/useQueryString";
 import * as tripApi from "./tripQueries";
 import { hasPermissionToDoAction } from "../../utils/CrudPermission";
 import { parse, format } from "date-fns";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Trip = () => {
   const theme = useTheme();
@@ -42,6 +44,7 @@ const Trip = () => {
   const [filtering, setFiltering] = useState("");
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
+
 
   const queryClient = useQueryClient();
 
@@ -109,6 +112,14 @@ const Trip = () => {
         },
       },
       {
+        header: "Driver Name",
+        accessorFn: (row) => row.driver.fullName, // Truy cập thuộc tính fullName trong driver
+        footer: "Driver Name",
+        width: 150,
+        maxWidth: 200,
+        align: "center",
+      },      
+      {
         header: "Action",
         accessorKey: "action",
         footer: "Action",
@@ -173,6 +184,7 @@ const Trip = () => {
     });
   };
 
+
   const handleOpenAddNewForm = () => {
     const hasAddPermission = hasPermissionToDoAction(
       "CREATE",
@@ -212,7 +224,7 @@ const Trip = () => {
     }
   };
 
-  // create deleteMutation
+  // create deleteMutation chưa hiển thị toast(thành công/thất bại)
   const deleteMutation = useMutation({
     mutationFn: (tripId) => tripApi.deleteTrip(tripId),
   });

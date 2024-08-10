@@ -26,7 +26,7 @@ const CustomDataTable = ({ table, colors, totalElements }) => {
           fontSize: "13px",
         },
         "& .MuiTableCell-head": {
-          bgcolor: colors.blueAccent[700],
+          bgcolor: colors.blueAccent[800],
           fontWeight: "bold",
         },
         "& .MuiTableBody-root": {

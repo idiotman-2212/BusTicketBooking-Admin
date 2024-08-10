@@ -31,6 +31,7 @@ import useLogin from "./utils/useLogin";
 import ChangePassword from "./scenes/ChangePassword";
 import ForgotPwd from "./scenes/ForgotPwd";
 
+//kiểm tra quyền người dùng 
 const hasReadAccessRoleToScreen = (permissions, pathname) => {
   const roleKeys = Object.keys(permissions);
   // admin is allowed to access all resources
@@ -84,55 +85,51 @@ const App = () => {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        {/* <ToastContainer position="bottom-right" /> */}
+        <ToastContainer position="bottom-right" />
         <QueryClientProvider client={queryClient}>
           <div className="app">
             <Sidebar />
             <main className="content">
               <Topbar />
               <Routes>
-                <Route path="/">
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/forgot" element={<ForgotPwd />} />
-                  <Route path="/not-allowed" element={<NotAllowedAccess />} />
-                  <Route element={<ProtectedRoutes />}>
-                    <Route path="dashboard" element={<DashBoard />} />
-                    <Route path="settings" element={<UserSettings />} />
-                    <Route
-                      path="change-password"
-                      element={<ChangePassword />}
-                    />
-                    <Route path="drivers">
-                      <Route index element={<Driver />} />
-                      <Route path=":driverId" element={<DriverForm />} />
-                      <Route path="new" element={<DriverForm />} />
-                    </Route>
-                    <Route path="trips">
-                      <Route index element={<Trip />} />
-                      <Route path=":tripId" element={<TripForm />} />
-                      <Route path="new" element={<TripForm />} />
-                    </Route>
-                    <Route path="tickets">
-                      <Route index element={<Ticket />} />
-                      <Route path=":bookingId" element={<BookingForm />} />
-                      <Route path="new" element={<StepperBooking />} />
-                    </Route>
-                    <Route path="coaches">
-                      <Route index element={<Bus />} />
-                      <Route path=":coachId" element={<CoachForm />} />
-                      <Route path="new" element={<CoachForm />} />
-                    </Route>
-                    <Route path="discounts">
-                      <Route index element={<Discount />} />
-                      <Route path=":discountId" element={<DiscountForm />} />
-                      <Route path="new" element={<DiscountForm />} />
-                    </Route>
-                    <Route path="reports" element={<Report />} />
-                    <Route path="users">
-                      <Route index element={<User />} />
-                      <Route path=":username" element={<UserForm />} />
-                      <Route path="new" element={<UserForm />} />
-                    </Route>
+                <Route path="/" element={<Navigate to="/dashboard" />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/forgot" element={<ForgotPwd />} />
+                <Route path="/not-allowed" element={<NotAllowedAccess />} />
+                <Route element={<ProtectedRoutes />}>
+                  <Route path="/dashboard" element={<DashBoard />} />
+                  <Route path="/settings" element={<UserSettings />} />
+                  <Route path="/change-password" element={<ChangePassword />} />
+                  <Route path="/drivers">
+                    <Route index element={<Driver />} />
+                    <Route path=":driverId" element={<DriverForm />} />
+                    <Route path="new" element={<DriverForm />} />
+                  </Route>
+                  <Route path="/trips">
+                    <Route index element={<Trip />} />
+                    <Route path=":tripId" element={<TripForm />} />
+                    <Route path="new" element={<TripForm />} />
+                  </Route>
+                  <Route path="/tickets">
+                    <Route index element={<Ticket />} />
+                    <Route path=":bookingId" element={<BookingForm />} />
+                    <Route path="new" element={<StepperBooking />} />
+                  </Route>
+                  <Route path="/coaches">
+                    <Route index element={<Bus />} />
+                    <Route path=":coachId" element={<CoachForm />} />
+                    <Route path="new" element={<CoachForm />} />
+                  </Route>
+                  <Route path="/discounts">
+                    <Route index element={<Discount />} />
+                    <Route path=":discountId" element={<DiscountForm />} />
+                    <Route path="new" element={<DiscountForm />} />
+                  </Route>
+                  <Route path="/reports" element={<Report />} />
+                  <Route path="/users">
+                    <Route index element={<User />} />
+                    <Route path=":username" element={<UserForm />} />
+                    <Route path="new" element={<UserForm />} />
                   </Route>
                 </Route>
               </Routes>

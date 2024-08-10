@@ -28,6 +28,7 @@ const Report = () => {
   const [timeOption, setTimeOption] = useState("WEEK");
   const [reportOption, setReportOption] = useState("revenue");
 
+  //lấy doanh thu theo khoảng tg
   const revenueQuery = useQuery({
     queryKey: ["reports", "revenue", startDate, endDate, timeOption],
     queryFn: () =>
@@ -40,6 +41,7 @@ const Report = () => {
     enabled: timeOption !== "WEEK",
   });
 
+  //lấy doanh thu theo tuần
   const weekRevenueQuery = useQuery({
     queryKey: ["reports", "weeks", startDate],
     queryFn: () =>
@@ -48,6 +50,7 @@ const Report = () => {
     enabled: timeOption === "WEEK",
   });
 
+  //lấy xe đã sử dụng trong khoảng tg
   const coachUsageQuery = useQuery({
     queryKey: ["reports", "coachUsage", startDate, endDate, timeOption],
     queryFn: () =>
@@ -60,6 +63,7 @@ const Report = () => {
     enabled: reportOption === "coachUsage",
   });
 
+  //top 5 tuyến đường hay chạy theo khoảng thời gian
   const topRouteQuery = useQuery({
     queryKey: ["reports", "topRoute", startDate, endDate, timeOption],
     queryFn: () =>

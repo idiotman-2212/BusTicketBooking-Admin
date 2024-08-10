@@ -98,8 +98,8 @@ const Sidebar = () => {
                 ml="15px"
               >
                 {/* Có thể thay greeting, username ở đây */}
-                <Typography variant="h4" color={colors.grey[100]}>
-                  ADMINS
+                <Typography variant="h3" color={colors.grey[100]} fontWeight="bold">
+                  ADMIN
                 </Typography>
                 <IconButton>
                   <MenuOutlinedIcon />

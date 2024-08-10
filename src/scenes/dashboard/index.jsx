@@ -19,13 +19,14 @@ import { ROLES, SCREENS } from "../../utils/appContants";
 const DashBoard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-
+// lấy doanh thu theo tuần
   const weekRevenueQuery = useQuery({
     queryKey: ["reports", "weeks"],
     queryFn: () =>
       reportApi.getTotalWeekRevenue(format(new Date(), "yyyy-MM-dd")),
   });
 
+  //lấy chuyến xe hay sử dụng
   const coachUsageQuery = useQuery({
     queryKey: ["reports", "coachUsage"],
     queryFn: () =>
@@ -36,16 +37,19 @@ const DashBoard = () => {
       ),
   });
 
+  //lấy tổng tài xế
   const totalDriverQuery = useQuery({
     queryKey: ["drivers", "all"],
     queryFn: () => driverApi.getAll(),
   });
 
+  //lấy tổng chuyến xe
   const totalCoachQuery = useQuery({
     queryKey: ["coaches", "all"],
     queryFn: () => coachApi.getAll(),
   });
 
+  //lấy tổng người dùng
   const totalUserQuery = useQuery({
     queryKey: ["users", "all"],
     queryFn: () => userApi.getAll(),

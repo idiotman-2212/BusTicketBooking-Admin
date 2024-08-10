@@ -33,6 +33,7 @@ import * as provinceApi from "../../../global/provinceQueries";
 import * as bookingApi from "../../../ticket/ticketQueries";
 import * as tripApi from "../../../trip/tripQueries";
 
+//lấy giá sau khi áp mã
 const getBookingPriceString = (trip) => {
   let finalPrice = trip.price;
   if (!isNaN(trip?.discount?.amount)) {
@@ -70,6 +71,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     queryFn: () => provinceApi.getAll(),
     enabled: provinceClicked,
   });
+
   const handleProvinceOpen = () => {
     if (!provinceQuery.data) {
       setProvinceClicked(true);
@@ -121,11 +123,13 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     setSelectedDestination(selectedSource);
   };
 
+  //Lấy số ghế đã được đặt cho một chuyến đi cụ thể.
   const getNumberOfOrderedSeats = async (tripId) => {
     const resp = await bookingApi.getSeatBooking(tripId);
     return resp;
   };
 
+  
   useEffect(() => {
     const fetchOrderedSeats = async () => {
       if (findTripQuery.data && values.bookingDateTime) {

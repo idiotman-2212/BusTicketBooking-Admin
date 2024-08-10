@@ -30,6 +30,8 @@ import * as discountApi from "../../discount/discountQueries";
 import * as driverApi from "../../driver/driverQueries";
 import * as provinceApi from "../../global/provinceQueries";
 import * as tripApi from "../../trip/tripQueries";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -169,33 +171,49 @@ const TripForm = () => {
   });
 
   // HANDLE FORM SUBMIT
-  const handleFormSubmit = (values, { resetForm }) => {
+  const handleFormSubmit = async (values, { resetForm }) => {
     let { isEditMode, ...newValues } = values;
-    if (isAddMode) {
-      mutation.mutate(newValues, {
-        onSuccess: () => {
-          resetForm();
-          handleToast("success", "Add new trip successfully");
-        },
-        onError: (error) => {
-          console.log(error);
-          handleToast("error", error.response?.data?.message);
-        },
-      });
-    } else {
-      updateMutation.mutate(newValues, {
-        onSuccess: (data) => {
-          queryClient.setQueryData(["trips", tripId], data);
-          handleToast("success", "Update trip successfully");
-        },
-        onError: (error) => {
-          console.log(error);
-          handleToast("error", error.response?.data?.message);
-        },
-      });
+
+    try {
+      // Kiểm tra chuyến đi gần đây của tài xế
+      const response = await tripApi.checkRecentTrips(newValues.driver.id, newValues.departureDateTime);
+
+      if (response.length > 0) {
+        handleToast("error", "Driver must wait for 2 days before creating a new trip.");
+        return;
+      }
+
+      // Thực hiện thao tác tạo hoặc chỉnh sửa nếu không có chuyến đi gần đây
+      if (isAddMode) {
+        mutation.mutate(newValues, {
+          onSuccess: () => {
+            resetForm();
+            handleToast("success", "Add new trip successfully");
+          },
+          onError: (error) => {
+            console.error(error);
+            handleToast("error", error.response?.data?.message || "An error occurred");
+          },
+        });
+      } else {
+        updateMutation.mutate(newValues, {
+          onSuccess: (data) => {
+            queryClient.setQueryData(["trips", tripId], data);
+            handleToast("success", "Update trip successfully");
+          },
+          onError: (error) => {
+            console.error(error);
+            handleToast("error", error.response?.data?.message || "An error occurred");
+          },
+        });
+      }
+      queryClient.removeQueries({ queryKey: ["trips"], type: "inactive" });
+    } catch (error) {
+      console.error('Error:', error);
+      handleToast("error", "An error occurred while checking recent trips.");
     }
-    queryClient.removeQueries({ queryKey: ["trips"], type: "inactive" });
   };
+  
 
   return (
     <Box m="20px">

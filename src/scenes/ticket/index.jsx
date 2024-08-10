@@ -296,7 +296,7 @@ const Ticket = () => {
     }
   };
 
-  // create deleteMutation
+  // create deleteMutation chưa hiển thị toast(thành công/thất bại)
   const deleteMutation = useMutation({
     mutationFn: (bookingId) => ticketApi.deleteBooking(bookingId),
   });
@@ -316,6 +316,7 @@ const Ticket = () => {
     });
   };
 
+  //xử lý search
   const table = useReactTable({
     data: data?.dataList ?? [], // if data is not available, provide empty dataList []
     columns,
@@ -331,6 +332,7 @@ const Ticket = () => {
     manualPagination: true,
   });
 
+  
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">

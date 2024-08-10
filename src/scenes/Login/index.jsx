@@ -58,12 +58,14 @@ const Login = () => {
     mutationFn: (authReq) => authApi.login(authReq),
   });
 
+  //lấy quyền người dùng
   const handleGetUserPermissions = async (username) => {
     const data = await userApi.getUserPermission(username);
     const permissions = data.permission;
     return permissions;
   };
 
+  //kiểm tra quyền người dùng để điều hướng đến trang chính
   const handleAccessAdminPage = (permissions) => {
     const allowedRoles = [ROLES.ROLE_ADMIN, ROLES.ROLE_STAFF];
     const userRoles = Object.keys(permissions);
@@ -73,6 +75,7 @@ const Login = () => {
     return hasAccessPermission;
   };
 
+  
   const handleFormSubmit = (values, actions) => {
     loginMutation.mutate(values, {
       onSuccess: async (data) => {
@@ -82,7 +85,7 @@ const Login = () => {
         // get user role list
         const permissions = await handleGetUserPermissions(values.username);
         const isAllowedAccess = handleAccessAdminPage(permissions);
-
+        console.log("eee")
         if (isAllowedAccess) {
           navigate("/dashboard");
           localStorage.setItem("permissions", JSON.stringify(permissions));

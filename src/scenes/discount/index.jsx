@@ -281,7 +281,7 @@ const Discount = () => {
     }
   };
 
-  // create deleteMutation
+  // create deleteMutation chưa hiển thị toast(thành công/thất bại)
   const deleteMutation = useMutation({
     mutationFn: (discountId) => discountApi.deleteDiscount(discountId),
   });
