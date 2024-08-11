@@ -117,6 +117,16 @@ const Ticket = () => {
         },
       },
       {
+        header: "Phone",
+        accessorKey: "phone",
+        footer: "Phone",
+        width: 150,
+        maxWidth: 200,
+        align: "center",
+        cell: (info) => info.getValue(),
+        filterFn: 'includesString', // Hàm lọc cho cột này
+      },
+      {
         header: "Trip",
         accessorKey: "trip",
         footer: "Trip",
@@ -244,7 +254,7 @@ const Ticket = () => {
       });
       return ticketApi.getPageOfBookings(
         pagination.pageIndex,
-        pagination.pageSize
+        pagination.pageSize,
       );
     },
     keepPreviousData: true,
@@ -325,10 +335,10 @@ const Ticket = () => {
     pageCount: data?.pageCount ?? -1,
     state: {
       pagination,
-      globalFilter: filtering,
+      globalFilter: filtering,// Cập nhật globalFilter với giá trị filtering
     },
     onPaginationChange: setPagination,
-    onGlobalFilterChange: setFiltering,
+    onGlobalFilterChange: setFiltering, // Cập nhật giá trị filtering khi có thay đổi
     manualPagination: true,
   });
 
