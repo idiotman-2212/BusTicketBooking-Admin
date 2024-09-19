@@ -22,6 +22,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   username: localStorage.getItem("loginUser"),
@@ -44,6 +45,7 @@ const ChangePassword = () => {
   const colors = tokens(theme.palette.mode);
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
+  const {t} = useTranslation();
   const changePwdMutation = useMutation({
     mutationFn: (changePwdRequest) => authApi.changePwd(changePwdRequest),
   });
@@ -98,7 +100,7 @@ const ChangePassword = () => {
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">
-                  Change password
+                  {t('Change password')}
                 </Typography>
               </Box>
 
@@ -109,7 +111,7 @@ const ChangePassword = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Username *"
+                label={t("Username *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.username}
@@ -129,12 +131,12 @@ const ChangePassword = () => {
               >
                 <InputLabel
                   error={!!touched.newPassword && !!errors.newPassword}
-                  htmlFor="outlined-adornment-password"
+                  htmlFor="new-password"
                 >
-                  New password *
+                  {t('New password *')}
                 </InputLabel>
                 <OutlinedInput
-                  id="outlined-adornment-password"
+                  id="new-password"
                   type={showPwd ? "text" : "password"}
                   label="Mật khẩu *"
                   fullWidth
@@ -168,12 +170,12 @@ const ChangePassword = () => {
               >
                 <InputLabel
                   error={!!touched.reNewPassword && !!errors.reNewPassword}
-                  htmlFor="outlined-adornment-password"
+                  htmlFor="confirm-new-password"
                 >
-                  Confirm new password *
+                  {t('Confirm new password *')}
                 </InputLabel>
                 <OutlinedInput
-                  id="outlined-adornment-password"
+                  id="confirm-new-password"
                   type={showPwd ? "text" : "password"}
                   label="Mật khẩu *"
                   fullWidth
@@ -207,7 +209,7 @@ const ChangePassword = () => {
                   color="secondary"
                   type="submit"
                 >
-                  Change
+                  {t('Change')}
                 </Button>
               </Box>
             </Box>

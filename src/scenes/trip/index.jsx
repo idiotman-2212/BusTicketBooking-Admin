@@ -33,6 +33,7 @@ import { hasPermissionToDoAction } from "../../utils/CrudPermission";
 import { parse, format } from "date-fns";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 
 const Trip = () => {
   const theme = useTheme();
@@ -44,7 +45,7 @@ const Trip = () => {
   const [filtering, setFiltering] = useState("");
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
-
+  const {t} = useTranslation();
 
   const queryClient = useQueryClient();
 
@@ -52,7 +53,7 @@ const Trip = () => {
   const columns = useMemo(
     () => [
       {
-        header: "Coach",
+        header: t("Coach"),
         accessorKey: "coach",
         footer: "Coach",
         width: 120,
@@ -64,7 +65,7 @@ const Trip = () => {
         },
       },
       {
-        header: "From",
+        header: t("From"),
         accessorKey: "source",
         footer: "From",
         width: 150,
@@ -77,7 +78,7 @@ const Trip = () => {
         },
       },
       {
-        header: "To",
+        header: t("To"),
         accessorKey: "destination",
         footer: "To",
         width: 150,
@@ -90,7 +91,7 @@ const Trip = () => {
         },
       },
       {
-        header: "Price",
+        header: t("Price"),
         accessorKey: "price",
         footer: "Price",
         width: 70,
@@ -98,7 +99,7 @@ const Trip = () => {
         align: "center",
       },
       {
-        header: "Departure Date Time",
+        header: t("Departure DateTime"),
         accessorKey: "departureDateTime",
         footer: "Departure Time",
         width: 150,
@@ -112,7 +113,7 @@ const Trip = () => {
         },
       },
       {
-        header: "Driver Name",
+        header: t("Driver Name"),
         accessorFn: (row) => row.driver.fullName, // Truy cập thuộc tính fullName trong driver
         footer: "Driver Name",
         width: 150,
@@ -120,7 +121,7 @@ const Trip = () => {
         align: "center",
       },      
       {
-        header: "Action",
+        header: t("Action"),
         accessorKey: "action",
         footer: "Action",
         width: 120,
@@ -129,7 +130,7 @@ const Trip = () => {
         cell: (info) => {
           return (
             <Box>
-              <CustomToolTip title="Edit" placement="top">
+              <CustomToolTip title={t("Edit")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenUpdateForm(info.row.original.id);
@@ -138,7 +139,7 @@ const Trip = () => {
                   <EditOutlinedIcon />
                 </IconButton>
               </CustomToolTip>
-              <CustomToolTip title="Delete" placement="top">
+              <CustomToolTip title={t("Delete")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenDeleteForm(info.row.original.id);
@@ -192,7 +193,7 @@ const Trip = () => {
     );
     if (hasAddPermission) navigate("new");
     else {
-      setForbiddenMessage("You don't have permission to CREATE");
+      setForbiddenMessage(t("You don't have permission to CREATE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -205,7 +206,7 @@ const Trip = () => {
 
     if (hasUpdatePermission) navigate(`${selectedRow}`);
     else {
-      setForbiddenMessage("You don't have permission to UPDATE");
+      setForbiddenMessage(t("You don't have permission to UPDATE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -219,7 +220,7 @@ const Trip = () => {
       setSelectedRow(selectedRow);
       setOpenModal(!openModal);
     } else {
-      setForbiddenMessage("You don't have permission to DELETE");
+      setForbiddenMessage(t("You don't have permission to DELETE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -263,7 +264,7 @@ const Trip = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="TRIPS" subTitle="Trip management" />
+        <Header title={t("TRIPS")} subTitle={t("Trip management")} />
         {/*Table search input */}
         <Box
           width="350px"
@@ -274,7 +275,7 @@ const Trip = () => {
         >
           <InputBase
             sx={{ ml: 2, flex: 1 }}
-            placeholder="Search"
+            placeholder={t("Search")}
             value={filtering}
             onMouseEnter={async () => await prefetchAllTrips()}
             onClick={() => {
@@ -294,7 +295,7 @@ const Trip = () => {
           startIcon={<AddIcon />}
           size="large"
         >
-          Add new
+          {t("Add new")}
         </Button>
         {/* </Link> */}
       </Box>
@@ -342,7 +343,7 @@ const Trip = () => {
             <WarningRoundedIcon
               sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }}
             />{" "}
-            Delete Trip&nbsp;
+            {t("Delete Trip")}&nbsp;
             <span
               style={{
                 fontStyle: "italic",
@@ -359,19 +360,19 @@ const Trip = () => {
           >
             <Button
               variant="contained"
-              color="error"
+              color="success"
               startIcon={<CheckIcon />}
               onClick={() => handleDeleteTrip(selectedRow)}
             >
-              Confirm
+              {t("Confirm")}
             </Button>
             <Button
               variant="contained"
-              color="success"
+              color="error"
               startIcon={<ClearIcon />}
               onClick={() => setOpenModal(!openModal)}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
           </Box>
         </Box>

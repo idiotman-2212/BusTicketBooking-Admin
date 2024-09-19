@@ -32,6 +32,7 @@ import { tokens } from "../../../../theme";
 import * as provinceApi from "../../../global/provinceQueries";
 import * as bookingApi from "../../../ticket/ticketQueries";
 import * as tripApi from "../../../trip/tripQueries";
+import { useTranslation } from "react-i18next";
 
 //lấy giá sau khi áp mã
 const getBookingPriceString = (trip) => {
@@ -64,6 +65,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const queryClient = useQueryClient();
   const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
     field;
+  const {t} = useTranslation();
 
   // prepare data (province, trip, ...) for autocomplete combobox
   const provinceQuery = useQuery({
@@ -163,7 +165,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           }
           startIcon={<SearchIcon />}
         >
-          Find
+          {t("Find")}
         </LoadingButton>
       </Box>
       {/* BOOKING TYPE */}
@@ -521,7 +523,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 height: "100px",
               }}
             />
-            <Typography variant={"h4"}>No result</Typography>
+            <Typography variant={"h4"}>{t("No result")}</Typography>
           </Box>
         )}
       </Box>

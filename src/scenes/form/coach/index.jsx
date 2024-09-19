@@ -18,6 +18,7 @@ import Header from "../../../components/Header";
 import { debounce } from "../../../utils/debounce";
 import { handleToast } from "../../../utils/helpers";
 import * as coachApi from "../../bus/coachQueries";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   id: 0,
@@ -78,6 +79,7 @@ const CoachForm = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { coachId } = useParams();
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
 
   // Load coach data when mode is EDIT
   const { data } = useQuery({
@@ -101,7 +103,7 @@ const CoachForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new coach successfully");
+          handleToast("success", t("Add new coach successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -112,7 +114,7 @@ const CoachForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["coaches", coachId], data);
-          handleToast("success", "Update coach successfully");
+          handleToast("success", t("Update coach successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -125,8 +127,8 @@ const CoachForm = () => {
   return (
     <Box m="20px">
       <Header
-        title={isAddMode ? "CREATE COACH" : "EDIT COACH"}
-        subTitle={isAddMode ? "Create coach profile" : "Edit coach profile"}
+        title={isAddMode ? t("CREATE COACH") : t("EDIT COACH")}
+        subTitle={isAddMode ? t("Create coach profile") : t("Edit coach profile")}
       />
       <Formik
         onSubmit={handleFormSubmit}
@@ -160,7 +162,7 @@ const CoachForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Name"
+                label={t("Name")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.name}
@@ -177,7 +179,7 @@ const CoachForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="License Plate"
+                label={t("License Plate")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.licensePlate}
@@ -194,7 +196,7 @@ const CoachForm = () => {
                 fullWidth
                 variant="outlined"
                 type="number"
-                label="Capacity"
+                label={t("Capacity")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.capacity}
@@ -213,17 +215,17 @@ const CoachForm = () => {
                   gridColumn: "span 2",
                 }}
               >
-                <InputLabel id="coach-type-select">Coach Type</InputLabel>
+                <InputLabel id="coach-type-select">"{t('Coach Type')}"</InputLabel>
                 <Select
                   labelId="coach-type-select"
                   id="coach-type-select-demo"
                   value={values.coachType}
-                  label="Coach Type"
+                  label={t("Coach Type")}
                   onChange={(e) => setFieldValue("coachType", e.target.value)}
                 >
-                  <MenuItem value={"BED"}>BED</MenuItem>
-                  <MenuItem value={"CHAIR"}>CHAIR</MenuItem>
-                  <MenuItem value={"LIMOUSINE"}>LIMOUSINE</MenuItem>
+                  <MenuItem value={"BED"}>{t("BED")}</MenuItem>
+                  <MenuItem value={"CHAIR"}>{t("CHAIR")}</MenuItem>
+                  <MenuItem value={"LIMOUSINE"}>{t("LIMOUSINE")}</MenuItem>
                 </Select>
               </FormControl>
             </Box>
@@ -236,7 +238,7 @@ const CoachForm = () => {
                 loading={mutation.isLoading || updateMutation.isLoading}
                 startIcon={<SaveAsOutlinedIcon />}
               >
-                {isAddMode ? "CREATE" : "SAVE"}
+                {isAddMode ? t("CREATE") : t("SAVE")}
               </LoadingButton>
             </Box>
           </form>

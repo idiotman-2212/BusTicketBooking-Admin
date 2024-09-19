@@ -16,8 +16,10 @@ import {
 import Typography from "@mui/material/Typography";
 import { flexRender } from "@tanstack/react-table";
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
 const CustomDataTable = ({ table, colors, totalElements }) => {
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -132,7 +134,7 @@ const CustomDataTable = ({ table, colors, totalElements }) => {
         </Box>
         <Box ml="10px" sx={{ minWidth: 100 }}>
           <FormControl fullWidth size="small" color="warning">
-            <InputLabel id="pageSize">Size</InputLabel>
+            <InputLabel id="pageSize">{t('Size')}</InputLabel>
             <Select
               labelId="pageSize"
               id="page-size-select"
@@ -145,7 +147,7 @@ const CustomDataTable = ({ table, colors, totalElements }) => {
               <MenuItem value={5}>5</MenuItem>
               <MenuItem value={10}>10</MenuItem>
               <MenuItem value={25}>25</MenuItem>
-              <MenuItem value={totalElements}>All</MenuItem>
+              <MenuItem value={totalElements}>{t('All')}</MenuItem>
             </Select>
           </FormControl>
         </Box>

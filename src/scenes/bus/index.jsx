@@ -33,6 +33,7 @@ import { handleToast } from "../../utils/helpers";
 import { useQueryString } from "../../utils/useQueryString";
 import * as coachApi from "./coachQueries";
 import { hasPermissionToDoAction } from "../../utils/CrudPermission";
+import { useTranslation } from 'react-i18next';
 
 const Bus = () => {
   const theme = useTheme();
@@ -44,12 +45,13 @@ const Bus = () => {
   const queryClient = useQueryClient();
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
+  const {t} = useTranslation();
 
   // Columns
   const columns = useMemo(
     () => [
       {
-        header: "Name",
+        header: t("Name"),
         accessorKey: "name",
         footer: "Name",
         width: 150,
@@ -57,7 +59,7 @@ const Bus = () => {
         isEllipsis: true,
       },
       {
-        header: "Capacity",
+        header: t("Capacity"),
         accessorKey: "capacity",
         footer: "Capacity",
         width: 100,
@@ -65,7 +67,7 @@ const Bus = () => {
         align: "center",
       },
       {
-        header: "License Plate",
+        header: t("License Plate"),
         accessorKey: "licensePlate",
         footer: "License Plate",
         width: 150,
@@ -73,7 +75,7 @@ const Bus = () => {
         align: "center",
       },
       {
-        header: "Type",
+        header: t("Type"),
         accessorKey: "coachType",
         footer: "Type",
         width: 150,
@@ -112,7 +114,7 @@ const Bus = () => {
         },
       },
       {
-        header: "Action",
+        header: t("Action"),
         accessorKey: "action",
         footer: "Action",
         width: 120,
@@ -121,7 +123,7 @@ const Bus = () => {
         cell: (info) => {
           return (
             <Box>
-              <CustomToolTip title="Edit" placement="top">
+              <CustomToolTip title={t("Edit")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenUpdateForm(info.row.original.id);
@@ -130,7 +132,7 @@ const Bus = () => {
                   <EditOutlinedIcon />
                 </IconButton>
               </CustomToolTip>
-              <CustomToolTip title="Delete" placement="top">
+              <CustomToolTip title={t("Delete")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenDeleteForm(info.row.original.id);
@@ -253,7 +255,7 @@ const Bus = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="COACHES" subTitle="Coach management" />
+        <Header title={t("COACHES")} subTitle={t("Coach management")} />
         {/*Table search input */}
         <Box
           width="350px"
@@ -264,7 +266,7 @@ const Bus = () => {
         >
           <InputBase
             sx={{ ml: 2, flex: 1 }}
-            placeholder="Search"
+            placeholder={t("Search")}
             value={filtering}
             onMouseEnter={async () => await prefetchAllCoaches()}
             onClick={() => {
@@ -284,7 +286,7 @@ const Bus = () => {
             startIcon={<AddIcon />}
             size="large"
           >
-            Add new
+            {t('Add new')}
           </Button>
         </Link>
       </Box>
@@ -332,7 +334,7 @@ const Bus = () => {
             <WarningRoundedIcon
               sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }}
             />{" "}
-            Delete Coach&nbsp;
+            {t('Delete Coach')}&nbsp;
             <span
               style={{
                 fontStyle: "italic",
@@ -349,19 +351,19 @@ const Bus = () => {
           >
             <Button
               variant="contained"
-              color="error"
+              color="success"
               startIcon={<CheckIcon />}
               onClick={() => handleDeleteCoach(selectedRow)}
             >
-              Confirm
+              {t('Confirm')}
             </Button>
             <Button
               variant="contained"
-              color="success"
+              color="error"
               startIcon={<ClearIcon />}
               onClick={() => setOpenModal(!openModal)}
             >
-              Cancel
+              {t('Cancel')}
             </Button>
           </Box>
         </Box>

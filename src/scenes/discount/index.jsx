@@ -31,6 +31,8 @@ import { handleToast } from "../../utils/helpers";
 import { useQueryString } from "../../utils/useQueryString";
 import * as discountApi from "./discountQueries";
 import { hasPermissionToDoAction } from "../../utils/CrudPermission";
+import { useTranslation } from "react-i18next";
+
 
 const Discount = () => {
   const theme = useTheme();
@@ -42,12 +44,13 @@ const Discount = () => {
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
 
   // Columns
   const columns = useMemo(
     () => [
       {
-        header: "Code",
+        header: t("Code"),
         accessorKey: "code",
         footer: "Code",
         width: 150,
@@ -55,7 +58,7 @@ const Discount = () => {
         isEllipsis: true,
       },
       {
-        header: "Amount",
+        header: t("Amount"),
         accessorKey: "amount",
         footer: "Amount",
         width: 100,
@@ -63,7 +66,7 @@ const Discount = () => {
         align: "center",
       },
       {
-        header: "From",
+        header: t("From"),
         accessorKey: "startDateTime",
         footer: "From",
         width: 150,
@@ -77,7 +80,7 @@ const Discount = () => {
         },
       },
       {
-        header: "To",
+        header: t("To"),
         accessorKey: "endDateTime",
         footer: "To",
         width: 150,
@@ -91,7 +94,7 @@ const Discount = () => {
         },
       },
       {
-        header: "State",
+        header: t("State"),
         accessorKey: "state",
         footer: "State",
         width: 150,
@@ -175,7 +178,7 @@ const Discount = () => {
         },
       },
       {
-        header: "Action",
+        header: t("Action"),
         accessorKey: "action",
         footer: "Action",
         width: 120,
@@ -184,7 +187,7 @@ const Discount = () => {
         cell: (info) => {
           return (
             <Box>
-              <CustomToolTip title="Edit" placement="top">
+              <CustomToolTip title={t("Edit")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenUpdateForm(info.row.original.id);
@@ -193,7 +196,7 @@ const Discount = () => {
                   <EditOutlinedIcon />
                 </IconButton>
               </CustomToolTip>
-              <CustomToolTip title="Delete" placement="top">
+              <CustomToolTip title={t("Delete")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenDeleteForm(info.row.original.id);
@@ -249,7 +252,7 @@ const Discount = () => {
     );
     if (hasAddPermission) navigate("new");
     else {
-      setForbiddenMessage("You don't have permission to CREATE");
+      setForbiddenMessage(t("You don't have permission to CREATE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -262,7 +265,7 @@ const Discount = () => {
 
     if (hasUpdatePermission) navigate(`${selectedRow}`);
     else {
-      setForbiddenMessage("You don't have permission to UPDATE");
+      setForbiddenMessage(t("You don't have permission to UPDATE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -276,7 +279,7 @@ const Discount = () => {
       setSelectedRow(selectedRow);
       setOpenModal(!openModal);
     } else {
-      setForbiddenMessage("You don't have permission to DELETE");
+      setForbiddenMessage(t("You don't have permission to DELETE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -319,7 +322,7 @@ const Discount = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DISCOUNTS" subTitle="Discount management" />
+        <Header title={t("DISCOUNTS")} subTitle={t("Discount management")} />
         {/*Table search input */}
         <Box
           width="350px"
@@ -330,7 +333,7 @@ const Discount = () => {
         >
           <InputBase
             sx={{ ml: 2, flex: 1 }}
-            placeholder="Search"
+            placeholder={t("Search")}
             value={filtering}
             onMouseEnter={async () => await prefetchAllDiscounts()}
             onClick={() => {
@@ -350,7 +353,7 @@ const Discount = () => {
           startIcon={<AddIcon />}
           size="large"
         >
-          Add new
+          {t('Add new')}
         </Button>
         {/* </Link> */}
       </Box>
@@ -398,7 +401,7 @@ const Discount = () => {
             <WarningRoundedIcon
               sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }}
             />{" "}
-            Delete Discount&nbsp;
+            {t("Delete Discount")}&nbsp;
             <span
               style={{
                 fontStyle: "italic",
@@ -415,19 +418,19 @@ const Discount = () => {
           >
             <Button
               variant="contained"
-              color="error"
+              color="success"
               startIcon={<CheckIcon />}
               onClick={() => handleDeleteDiscount(selectedRow)}
             >
-              Confirm
+              {t("Confirm")}
             </Button>
             <Button
               variant="contained"
-              color="success"
+              color="error"
               startIcon={<ClearIcon />}
               onClick={() => setOpenModal(!openModal)}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
           </Box>
         </Box>

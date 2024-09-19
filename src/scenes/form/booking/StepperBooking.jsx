@@ -16,6 +16,7 @@ import validationSchema from "./validationSchema";
 import * as bookingApi from "../../ticket/ticketQueries";
 import { useMutation } from "@tanstack/react-query";
 import { handleToast } from "../../../utils/helpers";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   id: -1,
@@ -93,6 +94,7 @@ const StepperBooking = () => {
   const [bookingData, setBookingData] = useState(initialValues);
   const currentValidationSchema = validationSchema[activeStep];
   const isLastStep = activeStep === steps.length - 1;
+  const {t} = useTranslation();
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -127,7 +129,7 @@ const StepperBooking = () => {
       createMutation.mutate(newValues, {
         onSuccess: () => {
           actions.resetForm();
-          handleToast("success", "Add new Bookings successfully");
+          handleToast("success", t("Add new Bookings successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -153,7 +155,7 @@ const StepperBooking = () => {
 
   return (
     <Box m="20px">
-      <Header title={undefined} subTitle={"CREATE BOOKING"} />
+      <Header title={undefined} subTitle={t("CREATE BOOKING")} />
 
       <Box m="0 30px">
         <Stepper activeStep={activeStep}>
@@ -164,7 +166,7 @@ const StepperBooking = () => {
           ))}
         </Stepper>
         {activeStep === steps.length ? (
-          <Typography>All steps are finished</Typography>
+          <Typography>{t("All steps are finished")}</Typography>
         ) : (
           <Formik
             onSubmit={handleFormSubmit}
@@ -190,7 +192,7 @@ const StepperBooking = () => {
                       variant="contained"
                       onClick={handleBack}
                     >
-                      Back
+                      {t("Back")}
                     </Button>
                   )}
                   <LoadingButton
@@ -202,7 +204,7 @@ const StepperBooking = () => {
                     loading={isSubmitting}
                     startIcon={<SaveAsOutlinedIcon />}
                   >
-                    {!isLastStep ? "NEXT" : isAddMode ? "CREATE" : "SAVE"}
+                    {!isLastStep ? t("NEXT") : isAddMode ? t("CREATE") : t("SAVE")}
                   </LoadingButton>
                 </Box>
               </form>

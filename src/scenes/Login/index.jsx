@@ -25,6 +25,7 @@ import { debounce } from "../../utils/debounce";
 import { handleToast } from "../../utils/helpers";
 import useLogin from "../../utils/useLogin";
 import * as userApi from "../user/userQueries";
+import { useTranslation } from 'react-i18next';
 
 const initialValues = {
   username: "",
@@ -53,6 +54,7 @@ const Login = () => {
   const [showPwd, setShowPwd] = useState(false);
   const navigate = useNavigate();
   const isLoggedIn = useLogin();
+  const { t } = useTranslation();
 
   const loginMutation = useMutation({
     mutationFn: (authReq) => authApi.login(authReq),
@@ -85,22 +87,21 @@ const Login = () => {
         // get user role list
         const permissions = await handleGetUserPermissions(values.username);
         const isAllowedAccess = handleAccessAdminPage(permissions);
-        console.log("eee")
         if (isAllowedAccess) {
           navigate("/dashboard");
           localStorage.setItem("permissions", JSON.stringify(permissions));
-          handleToast("success", "Login successfully");
+          handleToast("success", t("Login successfully"));
         } else {
           navigate("/login");
           localStorage.removeItem("acToken");
           localStorage.removeItem("loginUser");
-          handleToast("error", "You don't have permission to access");
+          handleToast("error", t("You don't have permission to access"));
         }
       },
       onError: (error) => {
         console.log(error);
         if (error.response?.status === 403) {
-          handleToast("error", "Wrong password");
+          handleToast("error", t("Wrong password"));
         } else handleToast("error", error.response?.data?.message);
       },
     });
@@ -140,7 +141,7 @@ const Login = () => {
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">
-                  Login
+                  {t('Login')}
                 </Typography>
               </Box>
 
@@ -150,7 +151,7 @@ const Login = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Username *"
+                label={t("Username *")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.username}
@@ -209,7 +210,7 @@ const Login = () => {
                   color="success"
                   type="submit"
                 >
-                  Login
+                  {t('Login')}
                 </Button>
               </Box>
               <Box
@@ -223,11 +224,11 @@ const Login = () => {
               >
                 <Box>
                   <Typography component="span" variant="h5">
-                    Forgot your account ?
+                    {t('Forgot your account ?')}
                     <Link to="/forgot" style={{ textDecoration: "none" }}>
                       <Typography component="span" variant="h5">
                         {" "}
-                        Reset Password
+                        {t('Reset Password')}
                       </Typography>
                     </Link>
                   </Typography>

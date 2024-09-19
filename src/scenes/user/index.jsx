@@ -44,6 +44,7 @@ import { useQueryString } from "../../utils/useQueryString";
 import * as userApi from "./userQueries";
 import { hasPermissionToDoAction } from "../../utils/CrudPermission";
 import { ROLES, SCREENS } from "../../utils/appContants";
+import { useTranslation } from "react-i18next";
 
 const User = () => {
   const theme = useTheme();
@@ -61,6 +62,7 @@ const User = () => {
   const [isReadChecked, setReadChecked] = useState(false);
   const [isUpdateChecked, setUpdateChecked] = useState(false);
   const [isDeleteChecked, setDeleteChecked] = useState(false);
+  const {t} = useTranslation();
 
   const hasMainRoleInPermissionList = (mainRole, permissions) => {
     return permissions.some(
@@ -86,7 +88,7 @@ const User = () => {
   const columns = useMemo(
     () => [
       {
-        header: "First Name",
+        header: t("First Name"),
         accessorKey: "firstName",
         footer: "First Name",
         width: 150,
@@ -94,7 +96,7 @@ const User = () => {
         isEllipsis: true,
       },
       {
-        header: "Last Name",
+        header: t("Last Name"),
         accessorKey: "lastName",
         footer: "Last Name",
         width: 100,
@@ -111,7 +113,7 @@ const User = () => {
         isEllipsis: true,
       },
       {
-        header: "Phone",
+        header: t("Phone"),
         accessorKey: "phone",
         footer: "Phone",
         width: 100,
@@ -120,7 +122,7 @@ const User = () => {
         align: "center",
       },
       {
-        header: "Gender",
+        header: t("Gender"),
         accessorKey: "gender",
         footer: "Gender",
         width: 60,
@@ -135,7 +137,7 @@ const User = () => {
           ),
       },
       {
-        header: "Active",
+        header: t("Active"),
         accessorKey: "active",
         footer: "Active",
         width: 60,
@@ -149,7 +151,7 @@ const User = () => {
           ),
       },
       {
-        header: "Roles",
+        header: t("Roles"),
         accessorKey: "roles",
         footer: "Roles",
         width: 150,
@@ -179,7 +181,7 @@ const User = () => {
         },
       },
       {
-        header: "Action",
+        header: t("Action"),
         accessorKey: "action",
         footer: "Action",
         width: 120,
@@ -191,7 +193,7 @@ const User = () => {
             <Box>
               {mainRole !== "ADMIN" && (
                 <>
-                  <CustomToolTip title="Edit" placement="top">
+                  <CustomToolTip title={t("Edit")} placement="top">
                     <IconButton
                       onClick={() => {
                         handleOpenUpdateForm(info.row.original.username);
@@ -200,7 +202,7 @@ const User = () => {
                       <EditOutlinedIcon />
                     </IconButton>
                   </CustomToolTip>
-                  <CustomToolTip title="Delete" placement="top">
+                  <CustomToolTip title={t("Delete")} placement="top">
                     <IconButton
                       onClick={() => {
                         const loginUser = localStorage.getItem("loginUser");
@@ -453,7 +455,7 @@ const User = () => {
             setCreateChecked(e.target.checked);
           }}
           control={<Checkbox color="success" />}
-          label="CREATE"
+          label={t("CREATE")}
           color="#00bf0a"
           sx={{ color: "#00bf0a" }}
         />
@@ -463,7 +465,7 @@ const User = () => {
             setReadChecked(e.target.checked);
           }}
           control={<Checkbox color="info" />}
-          label="READ"
+          label={t("READ")}
           color="#129ce4"
           sx={{ color: "#129ce4" }}
         />
@@ -473,7 +475,7 @@ const User = () => {
             setUpdateChecked(e.target.checked);
           }}
           control={<Checkbox color="warning" />}
-          label="UPDATE"
+          label={t("UPDATE")}
           color="#f06d0c"
           sx={{ color: "#f06d0c" }}
         />
@@ -483,7 +485,7 @@ const User = () => {
             setDeleteChecked(e.target.checked);
           }}
           control={<Checkbox color="error" />}
-          label="DELETE"
+          label={t("DELETE")}
           sx={{ color: "#e1000f" }}
         />
       </>
@@ -493,7 +495,7 @@ const User = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="USERS" subTitle="User management" />
+        <Header title={t("USERS")} subTitle={t("User management")} />
         {/*Table search input */}
         <Box
           width="350px"
@@ -504,7 +506,7 @@ const User = () => {
         >
           <InputBase
             sx={{ ml: 2, flex: 1 }}
-            placeholder="Search"
+            placeholder={t("Search")}
             value={filtering}
             onMouseEnter={async () => await prefetchAllUsers()}
             onClick={() => {
@@ -524,7 +526,7 @@ const User = () => {
           startIcon={<AddIcon />}
           size="large"
         >
-          Add new
+          {t("Add new")}
         </Button>
         {/* </Link> */}
       </Box>
@@ -715,19 +717,19 @@ const User = () => {
           >
             <Button
               variant="contained"
-              color="error"
+              color="success"
               startIcon={<CheckIcon />}
               onClick={() => handleDeleteUser(selectedRow)}
             >
-              Confirm
+              {t("Confirm")}
             </Button>
             <Button
               variant="contained"
-              color="success"
+              color="error"
               startIcon={<ClearIcon />}
               onClick={() => setOpenModal(!openModal)}
             >
-              Cancel
+              {("Cancel")}
             </Button>
           </Box>
         </Box>

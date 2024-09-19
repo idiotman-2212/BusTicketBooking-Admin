@@ -9,6 +9,8 @@ import { APP_CONSTANTS } from "../../utils/appContants";
 import { debounce } from "../../utils/debounce";
 import { handleToast } from "../../utils/helpers";
 import * as authApi from "../global/authQueries";
+import { useTranslation } from "react-i18next";
+
 
 const initialValues = {
   email: "",
@@ -35,6 +37,7 @@ const ForgotPwd = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const forgotPwdMutation = useMutation({
     mutationFn: (email) => authApi.forgot(email),
@@ -87,7 +90,7 @@ const ForgotPwd = () => {
             >
               <Box gridColumn="span 4" textAlign="center" m="20px 0">
                 <Typography variant="h2" fontWeight="bold">
-                  Reset Password
+                  {t("Reset Password")}
                 </Typography>
               </Box>
               <TextField
@@ -116,7 +119,7 @@ const ForgotPwd = () => {
                   color="secondary"
                   type="submit"
                 >
-                  Send Email
+                  {t("Send Email")}
                 </Button>
               </Box>
 
@@ -131,11 +134,11 @@ const ForgotPwd = () => {
               >
                 <Box>
                   <Typography component="span" variant="h5">
-                    Already have an account ?
+                    {t("Already have an account ?")}
                     <Link to="/login" style={{ textDecoration: "none" }}>
                       <Typography component="span" variant="h5">
                         {" "}
-                        Login
+                        {t("Login")}
                       </Typography>
                     </Link>
                   </Typography>

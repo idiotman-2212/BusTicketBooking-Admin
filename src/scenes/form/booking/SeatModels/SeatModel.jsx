@@ -1,6 +1,7 @@
 import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined";
 import { Box, Typography } from "@mui/material";
 import React, { memo } from "react";
+import { useTranslation } from "react-i18next";
 
 const SeatModel = (props) => {
   const { seat, handleSeatChoose, coachType, selectedSeats, orderedSeats } =
@@ -8,6 +9,7 @@ const SeatModel = (props) => {
   const { name, choose } = seat;
   const isOrdered = orderedSeats.includes(name);
   const isChosen = selectedSeats.includes(name);
+  const {t} = useTranslation();
 
   const getSeatStateColor = () => {
     if (!isOrdered) {

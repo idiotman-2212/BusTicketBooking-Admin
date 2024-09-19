@@ -30,6 +30,7 @@ import { ROLES, SCREEN_PATH } from "./utils/appContants";
 import useLogin from "./utils/useLogin";
 import ChangePassword from "./scenes/ChangePassword";
 import ForgotPwd from "./scenes/ForgotPwd";
+import "./utils/i18n"; // Import cấu hình i18n
 
 //kiểm tra quyền người dùng 
 const hasReadAccessRoleToScreen = (permissions, pathname) => {

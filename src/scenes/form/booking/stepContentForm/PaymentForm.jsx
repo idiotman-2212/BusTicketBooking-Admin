@@ -16,6 +16,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { format, parse } from "date-fns";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -37,6 +38,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
     field;
 
+    const {t}  = useTranslation();
   const [cardPaymentSelect, setCardPaymentSelect] = useState(
     bookingData.paymentMethod === "CARD" ? true : false
   );
@@ -60,33 +62,33 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         {/* booking summary */}
         <Box display="flex" flexDirection="column" gap="10px" width="40%">
           <Typography variant="h3" fontWeight="bold" mb="16px">
-            Summary Booking Info
+            {t("Summary Booking Info")}
           </Typography>
           <Typography component="span" variant="h5">
-            <span style={{ fontWeight: "bold" }}>Route: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Route")}: </span>
             {`${trip.source.name} ${
               bookingData.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
             } ${trip.destination.name}`}
           </Typography>
           <Typography component="span" variant="h5">
-            <span style={{ fontWeight: "bold" }}>Coach: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Coach")}: </span>
             {`${trip.coach.name}, Type: ${trip.coach.coachType}`}
           </Typography>
           <Typography component="span" variant="h5">
-            <span style={{ fontWeight: "bold" }}>Datetime: </span>{" "}
+            <span style={{ fontWeight: "bold" }}>{t("Datetime")}: </span>{" "}
             {format(
               parse(trip.departureDateTime, "yyyy-MM-dd HH:mm", new Date()),
               "HH:mm dd-MM-yyyy"
             )}
           </Typography>
           <Typography component="span" variant="h5">
-            <span style={{ fontWeight: "bold" }}>Total: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Total")}: </span>
             {`${formatCurrency(totalPayment)} (${
               seatNumber.length
             } x ${formatCurrency(getBookingPrice(trip))})`}
           </Typography>
           <Typography component="span" variant="h5">
-            <span style={{ fontWeight: "bold" }}>Seats: </span>
+            <span style={{ fontWeight: "bold" }}>{t("Seats")}: </span>
             {seatNumber.join(", ")}
           </Typography>
         </Box>
@@ -103,7 +105,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Fist Name *"
+            label={t("Fist Name *")}
             onBlur={handleBlur}
             onChange={(e) => setFieldValue("firstName", e.target.value)}
             value={values.firstName}
@@ -122,7 +124,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Last Name *"
+            label={t("Last Name *")}
             onBlur={handleBlur}
             onChange={handleChange}
             value={values.lastName}
@@ -141,7 +143,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Phone *"
+            label={t("Phone *")}
             onBlur={handleBlur}
             onChange={handleChange}
             value={values.phone}
@@ -179,7 +181,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             fullWidth
             variant="outlined"
             type="text"
-            label="Pickup Address *"
+            label={t("Pickup Address *")}
             onBlur={handleBlur}
             onChange={handleChange}
             value={values.pickUpAddress}
@@ -198,7 +200,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             }}
           >
             <FormLabel color="warning" id="paymentMethod">
-              Payment Method
+              {t("Payment Method")}
             </FormLabel>
             <RadioGroup
               row
@@ -251,7 +253,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             }}
           >
             <FormLabel color="warning" id="paymentStatus">
-              Payment Status
+              {t("Payment Status")}
             </FormLabel>
             <RadioGroup
               row
@@ -274,7 +276,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                     }}
                   />
                 }
-                label="UNPAID"
+                label={t("UNPAID")}
               />
               <FormControlLabel
                 value="PAID"
@@ -288,7 +290,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                     }}
                   />
                 }
-                label="PAID"
+                label={t("PAID")}
               />
             </RadioGroup>
           </FormControl>

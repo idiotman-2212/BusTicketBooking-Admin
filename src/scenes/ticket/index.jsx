@@ -39,6 +39,7 @@ import * as userApi from "../user/userQueries";
 import * as ticketApi from "./ticketQueries";
 import { parse, format } from "date-fns";
 import { hasPermissionToDoAction } from "../../utils/CrudPermission";
+import { useTranslation } from "react-i18next";
 
 const getBookingDateFormat = (bookingDateTime) => {
   return format(
@@ -61,6 +62,7 @@ const Ticket = () => {
   const [filtering, setFiltering] = useState("");
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
+const {t} = useTranslation();
 
   const queryClient = useQueryClient();
 
@@ -86,7 +88,7 @@ const Ticket = () => {
   const columns = useMemo(
     () => [
       {
-        header: "Customer",
+        header: t("Customer"),
         accessorKey: "user",
         footer: "Customer",
         width: 150,
@@ -117,7 +119,7 @@ const Ticket = () => {
         },
       },
       {
-        header: "Phone",
+        header: t("Phone"),
         accessorKey: "phone",
         footer: "Phone",
         width: 150,
@@ -127,7 +129,7 @@ const Ticket = () => {
         filterFn: 'includesString', // Hàm lọc cho cột này
       },
       {
-        header: "Trip",
+        header: t("Trip"),
         accessorKey: "trip",
         footer: "Trip",
         width: 350,
@@ -146,7 +148,7 @@ const Ticket = () => {
                 <span style={{ margin: "0 6px" }}>&hArr;</span>
               )}
               {destination.name}
-              <CustomToolTip title="Detail" placement="top">
+              <CustomToolTip title={t("Detail")} placement="top">
                 <IconButton
                   onClick={() => {
                     // setSelectedTrip(id);
@@ -162,7 +164,7 @@ const Ticket = () => {
         },
       },
       {
-        header: "Seat Number",
+        header: t("Seat Number"),
         accessorKey: "seatNumber",
         footer: "Seat Number",
         width: 80,
@@ -170,7 +172,7 @@ const Ticket = () => {
         align: "center",
       },
       {
-        header: "Payment",
+        header: t("Payment"),
         accessorKey: "payment",
         footer: "Payment",
         width: 100,
@@ -185,7 +187,7 @@ const Ticket = () => {
               justifyContent="space-around"
             >
               {paymentStatus}
-              <CustomToolTip title="Detail" placement="top">
+              <CustomToolTip title={t("Detail")} placement="top">
                 <IconButton
                   onClick={() => {
                     setSelectedRow(info.row.original.id);
@@ -200,7 +202,7 @@ const Ticket = () => {
         },
       },
       {
-        header: "Action",
+        header: t("Action"),
         accessorKey: "action",
         footer: "Action",
         width: 120,
@@ -209,7 +211,7 @@ const Ticket = () => {
         cell: (info) => {
           return (
             <Box>
-              <CustomToolTip title="Edit" placement="top">
+              <CustomToolTip title={t("Edit")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenUpdateForm(info.row.original.id);
@@ -218,7 +220,7 @@ const Ticket = () => {
                   <EditOutlinedIcon />
                 </IconButton>
               </CustomToolTip>
-              <CustomToolTip title="Delete" placement="top">
+              <CustomToolTip title={t("Delete")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenDeleteForm(info.row.original.id);
@@ -274,7 +276,7 @@ const Ticket = () => {
     );
     if (hasAddPermission) navigate("new");
     else {
-      setForbiddenMessage("You don't have permission to CREATE");
+      setForbiddenMessage(t("You don't have permission to CREATE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -287,7 +289,7 @@ const Ticket = () => {
 
     if (hasUpdatePermission) navigate(`${selectedRow}`);
     else {
-      setForbiddenMessage("You don't have permission to UPDATE");
+      setForbiddenMessage(t("You don't have permission to UPDATE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -301,7 +303,7 @@ const Ticket = () => {
       setSelectedRow(selectedRow);
       setOpenModal(!openModal);
     } else {
-      setForbiddenMessage("You don't have permission to DELETE");
+      setForbiddenMessage(t("You don't have permission to DELETE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -346,7 +348,7 @@ const Ticket = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="Bookings" subTitle="Booking management" />
+        <Header title={t("Bookings")} subTitle={t("Booking management")} />
         {/*Table search input */}
         <Box
           width="350px"
@@ -357,7 +359,7 @@ const Ticket = () => {
         >
           <InputBase
             sx={{ ml: 2, flex: 1 }}
-            placeholder="Search"
+            placeholder={t("Search")}
             value={filtering}
             onMouseEnter={async () => await prefetchAllBookings()}
             onClick={() => {
@@ -377,7 +379,7 @@ const Ticket = () => {
           startIcon={<AddIcon />}
           size="large"
         >
-          Add new
+          {t("Add new")}
         </Button>
         {/* </Link> */}
       </Box>
@@ -415,7 +417,7 @@ const Ticket = () => {
           }}
         >
           <Box textAlign="center" marginBottom="30px">
-            <Typography variant="h4">CUSTOMER DETAIL</Typography>
+            <Typography variant="h4">{t("CUSTOMER DETAIL")}</Typography>
             <Typography mt="5px" variant="h5" fontStyle="italic">
               {bookingQuery.data?.user !== null
                 ? `Buy with Account (${bookingQuery.data?.user?.username})`
@@ -443,7 +445,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Full Name"
+                label={t("Full Name")}
                 name="fullName"
                 value={`${bookingQuery?.data?.custFirstName} ${bookingQuery?.data?.custLastName}`}
                 sx={{
@@ -456,7 +458,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Contact Phone"
+                label={t("Contact Phone")}
                 name="phone"
                 value={bookingQuery?.data?.phone}
                 sx={{
@@ -482,7 +484,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Pickup Address"
+                label={t("Pickup Address")}
                 name="address"
                 value={bookingQuery?.data?.pickUpAddress}
                 sx={{
@@ -520,7 +522,7 @@ const Ticket = () => {
           }}
         >
           <Box textAlign="center" marginBottom="30px">
-            <Typography variant="h4">TRIP DETAIL</Typography>
+            <Typography variant="h4">{t("TRIP DETAIL")}</Typography>
           </Box>
           {bookingQuery.isLoading ? (
             <Stack spacing={1}>
@@ -543,7 +545,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="From"
+                label={t("From")}
                 name="from"
                 value={bookingQuery?.data?.trip.source.name}
                 sx={{
@@ -556,7 +558,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="To"
+                label={t("To")}
                 name="to"
                 value={bookingQuery?.data?.trip.destination.name}
                 sx={{
@@ -569,7 +571,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Departure DateTime"
+                label={t("Departure DateTime")}
                 name="bookingDateTime"
                 value={format(
                   parse(
@@ -589,7 +591,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Driver"
+                label={t("Driver")}
                 name="driver"
                 value={`${bookingQuery?.data?.trip.driver.firstName} ${bookingQuery?.data?.trip.driver.lastName}`}
                 sx={{
@@ -603,7 +605,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Coach"
+                label={t("Coach")}
                 name="coach"
                 value={`${bookingQuery?.data?.trip.coach.name}\t\tTYPE:${bookingQuery?.data?.trip.coach.coachType}`}
                 sx={{
@@ -616,7 +618,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Price"
+                label={t("Price")}
                 name="price"
                 value={bookingQuery?.data?.trip.price}
                 sx={{
@@ -629,7 +631,7 @@ const Ticket = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Discount"
+                label={t("Discount")}
                 name="discount"
                 value={
                   bookingQuery?.data?.trip.discount
@@ -672,7 +674,7 @@ const Ticket = () => {
         >
           <Box textAlign="center" marginBottom="30px">
             <Typography variant="h4" fontWeight="bold">
-              PAYMENT DETAIL
+              {t("PAYMENT DETAIL")}
             </Typography>
           </Box>
           {bookingQuery.isLoading ? (
@@ -697,7 +699,7 @@ const Ticket = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Total"
+                  label={t("Total")}
                   name="totalPayment"
                   value={bookingQuery?.data?.totalPayment}
                   sx={{
@@ -710,7 +712,7 @@ const Ticket = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Date time"
+                  label={t("Date time")}
                   name="paymentDateTime"
                   value={bookingQuery?.data?.paymentDateTime}
                   sx={{
@@ -723,7 +725,7 @@ const Ticket = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Method"
+                  label={t("Method")}
                   name="paymentMethod"
                   value={bookingQuery?.data?.paymentMethod}
                   sx={{
@@ -736,7 +738,7 @@ const Ticket = () => {
                   fullWidth
                   variant="outlined"
                   type="text"
-                  label="Status"
+                  label={t("Status")}
                   name="paymentStatus"
                   value={bookingQuery?.data?.paymentStatus}
                   sx={{
@@ -750,7 +752,7 @@ const Ticket = () => {
                 fontWeight="bold"
                 textAlign="center"
               >
-                PAYMENT HISTORIES
+                {t("PAYMENT HISTORIES")}
               </Typography>
               {bookingQuery.data.paymentHistories.length === 0 ? undefined : (
                 <Box mt="20px" maxHeight="200px" overflow="auto">
@@ -770,7 +772,7 @@ const Ticket = () => {
                             "HH:mm:ss dd/MM/yyyy"
                           )}`}</Typography>
                           <Typography mt="4px" fontWeight="bold" variant="h5">
-                            {oldStatus ? oldStatus : "CREATE"} &rArr;{" "}
+                            {oldStatus ? oldStatus : t("CREATE")} &rArr;{" "}
                             {newStatus}
                           </Typography>
                         </Box>
@@ -819,7 +821,7 @@ const Ticket = () => {
             <WarningRoundedIcon
               sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }}
             />{" "}
-            Cancel Booking&nbsp;
+            {t("Cancel Booking")}&nbsp;
             <span
               style={{
                 fontStyle: "italic",
@@ -829,7 +831,7 @@ const Ticket = () => {
             </span>
           </Typography>
           <Typography textAlign="center" fontStyle="italic">
-            * This will turn payment status to CANCEL
+            {t("* This will turn payment status to CANCEL")}
           </Typography>
           <Box
             id="modal-modal-description"
@@ -843,7 +845,7 @@ const Ticket = () => {
               startIcon={<CheckIcon />}
               onClick={() => handleDeleteBooking(selectedRow)}
             >
-              Confirm
+              {t("Confirm")}
             </Button>
             <Button
               variant="contained"
@@ -851,7 +853,7 @@ const Ticket = () => {
               startIcon={<ClearIcon />}
               onClick={() => setOpenModal(!openModal)}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
           </Box>
         </Box>

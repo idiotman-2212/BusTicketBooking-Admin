@@ -5,6 +5,7 @@ import React, { memo, useCallback, useMemo, useState } from "react";
 import Bed_Limousine_Seat_Data from "../SeatModels/Bed_Limousine_Seat_Data";
 import SeatModel from "../SeatModels/SeatModel";
 import * as bookingApi from "../../../ticket/ticketQueries";
+import { useTranslation } from "react-i18next";
 
 const MAX_SEAT_SELECT = 5;
 
@@ -27,6 +28,7 @@ const CoachModel = (props) => {
   );
   const coachType = bookingData.trip.coach.coachType;
   const price = getBookingPrice(bookingData.trip);
+  const {t} = useTranslation();
 
   const seatBookingQuery = useQuery({
     queryKey: ["bookings", bookingData.trip.id, bookingData.bookingDateTime],
@@ -125,7 +127,7 @@ const CoachModel = (props) => {
               color: "#000",
             }}
           />
-          <Typography fontWeight="bold">Ordered</Typography>
+          <Typography fontWeight="bold">{t("Ordered")}</Typography>
         </Box>
         <Box textAlign="center">
           <SquareIcon
@@ -136,7 +138,7 @@ const CoachModel = (props) => {
               color: "#979797",
             }}
           />
-          <Typography fontWeight="bold">Empty</Typography>
+          <Typography fontWeight="bold">{t("Empty")}</Typography>
         </Box>
         <Box textAlign="center">
           <SquareIcon
@@ -147,7 +149,7 @@ const CoachModel = (props) => {
               color: "#ff4138",
             }}
           />
-          <Typography fontWeight="bold">Choosing</Typography>
+          <Typography fontWeight="bold">{t("Choosing")}</Typography>
         </Box>
       </Box>
 
@@ -195,7 +197,7 @@ const CoachModel = (props) => {
         </Typography>
         <Typography variant="h5">
           <span style={{ fontWeight: "bold" }}>
-            Total: {formatCurrency(price * numberOfSelectedSeats)}
+            {t("Total")}: {formatCurrency(price * numberOfSelectedSeats)}
           </span>
         </Typography>
       </Box>

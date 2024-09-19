@@ -15,10 +15,12 @@ import * as driverApi from "../driver/driverQueries";
 import * as userApi from "../user/userQueries";
 import * as coachApi from "../bus/coachQueries";
 import { ROLES, SCREENS } from "../../utils/appContants";
+import { useTranslation } from "react-i18next";
 
 const DashBoard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const {t} = useTranslation();
 // lấy doanh thu theo tuần
   const weekRevenueQuery = useQuery({
     queryKey: ["reports", "weeks"],
@@ -84,7 +86,7 @@ const DashBoard = () => {
 
   return (
     <Box m="20px">
-      <Header title="DASHBOARD" subTitle="Welcome to your dashboard" />
+      <Header title={t("DASHBOARD")} subTitle={t("Welcome to your dashboard")} />
       <Box
         display="grid"
         gridTemplateColumns="repeat(12, 1fr)"
@@ -112,7 +114,7 @@ const DashBoard = () => {
                   }}
                 />
               }
-              content={"Total Driver"}
+              content={t("Total Driver")}
               value={getAllAvailableDriver(totalDriverQuery.data)}
             />
           ) : undefined}
@@ -138,7 +140,7 @@ const DashBoard = () => {
                   }}
                 />
               }
-              content={"Total Coach"}
+              content={t("Total Coach")}
               value={totalCoachQuery.data.length}
             />
           ) : undefined}
@@ -164,7 +166,7 @@ const DashBoard = () => {
                   }}
                 />
               }
-              content={"Total Staff"}
+              content={t("Total Staff")}
               value={getAllAvailableStaff(totalUserQuery.data)}
             />
           ) : undefined}
@@ -190,7 +192,7 @@ const DashBoard = () => {
                   }}
                 />
               }
-              content={"Total Customer"}
+              content={t("Total Customer")}
               value={getAllAvailableCustomer(totalUserQuery.data)}
             />
           ) : undefined}
@@ -210,7 +212,7 @@ const DashBoard = () => {
         >
           {weekRevenueQuery?.data ? (
             <BarChart
-              title="Week Revenue"
+              title={t("Week Revenue")}
               entries={weekRevenueQuery.data.reportData}
             />
           ) : undefined}
@@ -228,7 +230,7 @@ const DashBoard = () => {
         >
           {coachUsageQuery.isSuccess && (
             <PieChart
-              title="Coach usage"
+              title={t("Coach usage")}
               entries={coachUsageQuery?.data.reportData}
             />
           )}

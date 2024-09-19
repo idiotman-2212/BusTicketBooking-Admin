@@ -34,6 +34,7 @@ import { APP_CONSTANTS } from "../../../utils/appContants";
 import { debounce } from "../../../utils/debounce";
 import { handleToast } from "../../../utils/helpers";
 import * as driverApi from "../../driver/driverQueries";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   id: "",
@@ -133,6 +134,7 @@ const DriverForm = () => {
   const isNonMobile = useMediaQuery("(min-width:600px)");
   const { driverId } = useParams();
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
 
   // Load user data when mode is EDIT
   const { data } = useQuery({
@@ -156,7 +158,7 @@ const DriverForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new driver successfully");
+          handleToast("success", t("Add new driver successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -167,7 +169,7 @@ const DriverForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["users", driverId], data);
-          handleToast("success", "Update driver successfully");
+          handleToast("success", t("Update driver successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -180,8 +182,8 @@ const DriverForm = () => {
   return (
     <Box m="20px">
       <Header
-        title={isAddMode ? "CREATE DRIVER" : "EDIT DRIVER"}
-        subTitle={isAddMode ? "Create driver profile" : "Edit driver profile"}
+        title={isAddMode ? t("CREATE DRIVER") : t("EDIT DRIVER")}
+        subTitle={isAddMode ? t("Create driver profile") : t("Edit driver profile")}
       />
       <Formik
         onSubmit={handleFormSubmit}
@@ -215,7 +217,7 @@ const DriverForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="First Name"
+                label={t("First Name")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.firstName}
@@ -232,7 +234,7 @@ const DriverForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Last Name"
+                label={t("Last Name")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.lastName}
@@ -249,7 +251,7 @@ const DriverForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Email"
+                label={t("Email")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.email}
@@ -266,7 +268,7 @@ const DriverForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Phone"
+                label={t("Phone")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.phone}
@@ -284,7 +286,7 @@ const DriverForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="License Number"
+                label={t("License Number")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.licenseNumber}
@@ -304,7 +306,7 @@ const DriverForm = () => {
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DatePicker
                     format="dd/MM/yyyy"
-                    label="Day of Birth"
+                    label={t("Day of Birth")}
                     maxDate={new Date()}
                     value={parse(values.dob, "yyyy-MM-dd", new Date())}
                     onChange={(newDate) => {
@@ -344,7 +346,7 @@ const DriverForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Address"
+                label={t("Address")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.address}
@@ -361,7 +363,7 @@ const DriverForm = () => {
                 }}
               >
                 <FormLabel color="warning" id="gender">
-                  Gender
+                  {t("Gender")}
                 </FormLabel>
                 <RadioGroup
                   row
@@ -374,7 +376,7 @@ const DriverForm = () => {
                 >
                   <FormControlLabel
                     value="false"
-                    label="Male"
+                    label={t("Male")}
                     control={
                       <Radio
                         sx={{
@@ -388,7 +390,7 @@ const DriverForm = () => {
                   />
                   <FormControlLabel
                     value="true"
-                    label="Female"
+                    label={t("Female")}
                     control={
                       <Radio
                         sx={{
@@ -410,7 +412,7 @@ const DriverForm = () => {
                   }}
                 >
                   <FormLabel color="warning" id="quit">
-                    Working
+                    {t("Working")}
                   </FormLabel>
                   <RadioGroup
                     row
@@ -433,7 +435,7 @@ const DriverForm = () => {
                           }}
                         />
                       }
-                      label="True"
+                      label={t("True")}
                     />
                     <FormControlLabel
                       value="true"
@@ -447,7 +449,7 @@ const DriverForm = () => {
                           }}
                         />
                       }
-                      label="False"
+                      label={t("False")}
                     />
                   </RadioGroup>
                 </FormControl>
@@ -463,7 +465,7 @@ const DriverForm = () => {
                 loading={mutation.isLoading || updateMutation.isLoading}
                 startIcon={<SaveAsOutlinedIcon />}
               >
-                {isAddMode ? "CREATE" : "SAVE"}
+                {isAddMode ? t("CREATE") : t("SAVE")}
               </LoadingButton>
             </Box>
           </form>

@@ -35,6 +35,7 @@ import { handleToast } from "../../utils/helpers";
 import { useQueryString } from "../../utils/useQueryString";
 import * as driverApi from "./driverQueries";
 import { hasPermissionToDoAction } from "../../utils/CrudPermission";
+import { useTranslation } from "react-i18next";
 
 const Driver = () => {
   const theme = useTheme();
@@ -46,12 +47,13 @@ const Driver = () => {
   const queryClient = useQueryClient();
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
+  const {t} = useTranslation();
 
   // Columns
   const columns = useMemo(
     () => [
       {
-        header: "First Name",
+        header: t("First Name"),
         accessorKey: "firstName",
         footer: "First Name",
         width: 150,
@@ -59,7 +61,7 @@ const Driver = () => {
         isEllipsis: true,
       },
       {
-        header: "Last Name",
+        header: t("Last Name"),
         accessorKey: "lastName",
         footer: "Last Name",
         width: 100,
@@ -68,7 +70,7 @@ const Driver = () => {
         align: "left",
       },
       {
-        header: "License Number",
+        header: t("License Number"),
         accessorKey: "licenseNumber",
         footer: "License Number",
         width: 180,
@@ -77,7 +79,7 @@ const Driver = () => {
         align: "center",
       },
       {
-        header: "Phone",
+        header: t("Phone"),
         accessorKey: "phone",
         footer: "Phone",
         width: 100,
@@ -86,7 +88,7 @@ const Driver = () => {
         align: "center",
       },
       {
-        header: "Gender",
+        header: t("Gender"),
         accessorKey: "gender",
         footer: "Gender",
         width: 60,
@@ -101,7 +103,7 @@ const Driver = () => {
           ),
       },
       {
-        header: "Address",
+        header: t("Address"),
         accessorKey: "address",
         footer: "Address",
         width: 150,
@@ -109,7 +111,7 @@ const Driver = () => {
         isEllipsis: true,
       },
       {
-        header: "Working",
+        header: t("Working"),
         accessorKey: "quit",
         footer: "Working",
         width: 60,
@@ -123,7 +125,7 @@ const Driver = () => {
           ),
       },
       {
-        header: "Action",
+        header: t("Action"),
         accessorKey: "action",
         footer: "Action",
         width: 120,
@@ -132,7 +134,7 @@ const Driver = () => {
         cell: (info) => {
           return (
             <Box>
-              <CustomToolTip title="Edit" placement="top">
+              <CustomToolTip title={t("Edit")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenUpdateForm(info.row.original.id);
@@ -141,7 +143,7 @@ const Driver = () => {
                   <EditOutlinedIcon />
                 </IconButton>
               </CustomToolTip>
-              <CustomToolTip title="Delete" placement="top">
+              <CustomToolTip title={t("Delete")} placement="top">
                 <IconButton
                   onClick={() => {
                     handleOpenDeleteForm(info.row.original.id);
@@ -197,7 +199,7 @@ const Driver = () => {
     );
     if (hasAddPermission) navigate("new");
     else {
-      setForbiddenMessage("You don't have permission to CREATE");
+      setForbiddenMessage(t("You don't have permission to CREATE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -210,7 +212,7 @@ const Driver = () => {
 
     if (hasUpdatePermission) navigate(`${selectedRow}`);
     else {
-      setForbiddenMessage("You don't have permission to UPDATE");
+      setForbiddenMessage(t("You don't have permission to UPDATE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -224,7 +226,7 @@ const Driver = () => {
       setSelectedRow(selectedRow);
       setOpenModal(!openModal);
     } else {
-      setForbiddenMessage("You don't have permission to DELETE");
+      setForbiddenMessage(t("You don't have permission to DELETE"));
       setOpenForbiddenModal(!openForbiddenModal);
     }
   };
@@ -267,7 +269,7 @@ const Driver = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="DRIVERS" subTitle="Driver management" />
+        <Header title={t("DRIVERS")} subTitle={t("Driver management")} />
         {/*Table search input */}
         <Box
           width="350px"
@@ -278,7 +280,7 @@ const Driver = () => {
         >
           <InputBase
             sx={{ ml: 2, flex: 1 }}
-            placeholder="Search"
+            placeholder={t("Search")}
             value={filtering}
             onMouseEnter={async () => await prefetchAllDrivers()}
             onClick={() => {
@@ -298,7 +300,7 @@ const Driver = () => {
           startIcon={<AddIcon />}
           size="large"
         >
-          Add new
+          {t("Add new")}
         </Button>
         {/* </Link> */}
       </Box>
@@ -363,19 +365,19 @@ const Driver = () => {
           >
             <Button
               variant="contained"
-              color="error"
+              color="success"
               startIcon={<CheckIcon />}
               onClick={() => handleDeleteDriver(selectedRow)}
             >
-              Confirm
+              {t("Confirm")}
             </Button>
             <Button
               variant="contained"
-              color="success"
+              color="error"
               startIcon={<ClearIcon />}
               onClick={() => setOpenModal(!openModal)}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
           </Box>
         </Box>

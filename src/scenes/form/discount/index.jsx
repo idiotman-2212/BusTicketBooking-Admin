@@ -23,6 +23,7 @@ import { tokens } from "../../../theme";
 import { debounce } from "../../../utils/debounce";
 import { handleToast } from "../../../utils/helpers";
 import * as discountApi from "../../discount/discountQueries";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   id: 0,
@@ -92,6 +93,7 @@ const DiscountForm = () => {
   const { discountId } = useParams();
   const queryClient = useQueryClient();
   const [remainingTime, setRemainingTime] = useState("");
+  const {t} = useTranslation();
 
   // Load coach data when mode is EDIT
   const { data } = useQuery({
@@ -116,7 +118,7 @@ const DiscountForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new discount successfully");
+          handleToast("success", t("Add new discount successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -127,7 +129,7 @@ const DiscountForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["discounts", discountId], data);
-          handleToast("success", "Update discount successfully");
+          handleToast("success", t("Update discount successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -140,9 +142,9 @@ const DiscountForm = () => {
   return (
     <Box m="20px">
       <Header
-        title={isAddMode ? "CREATE DISCOUNT" : "EDIT DISCOUNT"}
+        title={isAddMode ? t("CREATE DISCOUNT") : t("EDIT DISCOUNT")}
         subTitle={
-          isAddMode ? "Create discount profile" : "Edit discount profile"
+          isAddMode ? t("Create discount profile") : t("Edit discount profile")
         }
       />
       <Formik
@@ -177,7 +179,7 @@ const DiscountForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Code"
+                label={t("Code")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.code}
@@ -194,7 +196,7 @@ const DiscountForm = () => {
                 fullWidth
                 variant="outlined"
                 type="number"
-                label="Amount"
+                label={t("Amount")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.amount}
@@ -213,7 +215,7 @@ const DiscountForm = () => {
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DateTimePicker
                     format="HH:mm dd/MM/yyyy"
-                    label="Start datetime"
+                    label={t("Start datetime")}
                     minDateTime={new Date()}
                     value={parse(
                       values.startDateTime,
@@ -259,7 +261,7 @@ const DiscountForm = () => {
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DateTimePicker
                     format="HH:mm dd/MM/yyyy"
-                    label="End datetime"
+                    label={t("End datetime")}
                     minDateTime={parse(
                       values.startDateTime,
                       "yyyy-MM-dd HH:mm:ss",
@@ -311,7 +313,7 @@ const DiscountForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Remaining Time"
+                label={t("Remaining Time")}
                 onBlur={handleBlur}
                 name="remainingTime"
                 value={
@@ -342,7 +344,7 @@ const DiscountForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Description"
+                label={t("Description")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.description}
@@ -363,7 +365,7 @@ const DiscountForm = () => {
                 loading={mutation.isLoading || updateMutation.isLoading}
                 startIcon={<SaveAsOutlinedIcon />}
               >
-                {isAddMode ? "CREATE" : "SAVE"}
+                {isAddMode ? t("CREATE") : t("SAVE")}
               </LoadingButton>
             </Box>
           </form>

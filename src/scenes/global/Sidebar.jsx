@@ -19,11 +19,14 @@ import PasswordIcon from "@mui/icons-material/Password";
 import SettingsIcon from "@mui/icons-material/Settings";
 import * as authApi from "./authQueries";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Item = (props) => {
   const { title, to, icon, selected, setSelected } = props;
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+
   return (
     <MenuItem
       active={selected === title}
@@ -45,6 +48,7 @@ const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const isLoggedIn = useLogin();
   const loginUser = localStorage.getItem("loginUser");
@@ -99,7 +103,7 @@ const Sidebar = () => {
               >
                 {/* Có thể thay greeting, username ở đây */}
                 <Typography variant="h3" color={colors.grey[100]} fontWeight="bold">
-                  ADMIN
+                  {t("ADMIN")}
                 </Typography>
                 <IconButton>
                   <MenuOutlinedIcon />
@@ -126,7 +130,7 @@ const Sidebar = () => {
                     color={colors.grey[100]}
                     margin="10px 0 0 0"
                   >
-                    Hello
+                    {t("Welcome Back")}
                   </Typography>
                   <Typography variant="h5" color={colors.greenAccent[500]}>
                     {loginUser}
@@ -138,7 +142,7 @@ const Sidebar = () => {
 
           {/* Menu Items */}
           <Box paddingLeft={!isCollapsed ? "10%" : undefined}>
-            {sidebarItems.map((item, index) => {
+            {sidebarItems().map((item, index) => {
               return (
                 <Box key={index}>
                   {index % 3 === 0 && (
@@ -163,17 +167,17 @@ const Sidebar = () => {
               gap="20px"
               flexDirection={isCollapsed ? "column" : "row"}
             >
-              <Tooltip title="Logout">
+              <Tooltip title={t("Logout")}>
                 <IconButton onClick={handleLogout}>
                   <ExitToAppOutlinedIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="User's Profile">
+              <Tooltip title={t("User's Profile")}>
                 <IconButton onClick={() => navigate("/settings")}>
                   <SettingsIcon />
                 </IconButton>
               </Tooltip>
-              <Tooltip title="Change Password">
+              <Tooltip title={t("Change Password")}>
                 <IconButton onClick={() => navigate("/change-password")}>
                   <PasswordIcon />
                 </IconButton>

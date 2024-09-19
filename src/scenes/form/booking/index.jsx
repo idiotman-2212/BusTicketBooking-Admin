@@ -17,6 +17,7 @@ import { Formik } from "formik";
 import { LoadingButton } from "@mui/lab";
 import { handleToast } from "../../../utils/helpers";
 import { parse, format } from "date-fns";
+import { useTranslation } from "react-i18next";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -28,6 +29,7 @@ const formatCurrency = (amount) => {
 const BookingForm = () => {
   const { bookingId } = useParams();
   const queryClient = useQueryClient();
+  const {t} = useTranslation();
 
   const bookingQuery = useQuery({
     queryKey: ["bookings", bookingId],
@@ -42,7 +44,7 @@ const BookingForm = () => {
     updateMutation.mutate(values, {
       onSuccess: (data) => {
         queryClient.setQueryData(["bookings", bookingId], data);
-        handleToast("success", "Update Booking successfully");
+        handleToast("success", t("Update Booking successfully"));
       },
       onError: (error) => {
         console.log(error);
@@ -53,7 +55,7 @@ const BookingForm = () => {
 
   return (
     <Box m="20px">
-      <Header title={"EDIT BOOKING"} subTitle={"Edit booking profile"} />
+      <Header title={t("EDIT BOOKING")} subTitle={t("Edit booking profile")} />
       {!bookingQuery.isSuccess ? undefined : (
         <Formik
           onSubmit={handleFormSubmit}
@@ -78,33 +80,33 @@ const BookingForm = () => {
                 textAlign="center"
               >
                 <Typography variant="h3" fontWeight="bold" mb="16px">
-                  Summary Booking Info
+                  {t("Summary Booking Info")}
                 </Typography>
                 <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>Customer: </span>
+                  <span style={{ fontWeight: "bold" }}>{t("Customer")}: </span>
                   {`${values.custFirstName} ${values.custLastName}`}
                 </Typography>
                 <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>Contact Phone: </span>
+                  <span style={{ fontWeight: "bold" }}>{t("Contact Phone")}: </span>
                   {`${values.phone}`}
                 </Typography>
                 <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>Pickup Address: </span>
+                  <span style={{ fontWeight: "bold" }}>{t("Pickup Address")}: </span>
                   {`${values.pickUpAddress}`}
                 </Typography>
                 <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>Route: </span>
+                  <span style={{ fontWeight: "bold" }}>{t("Route")}: </span>
                   {`${values.trip.source.name} ${
                     values.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
                   } ${values.trip.destination.name}`}
                 </Typography>
                 <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>Coach: </span>
+                  <span style={{ fontWeight: "bold" }}>{t("Coach")}: </span>
                   {`${values.trip.coach.name}, Type: ${values.trip.coach.coachType}`}
                 </Typography>
                 <Typography component="span" variant="h5">
                   <span style={{ fontWeight: "bold" }}>
-                    Departure DateTime:{" "}
+                    {t("Departure DateTime")}:{" "}
                   </span>{" "}
                   {format(
                     parse(
@@ -116,24 +118,26 @@ const BookingForm = () => {
                   )}
                 </Typography>
                 <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>Total: </span>
+                  <span style={{ fontWeight: "bold" }}>{t("Total")}: </span>
                   {`${formatCurrency(values.totalPayment)}`}
                 </Typography>
                 <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>Seats: </span>
+                  <span style={{ fontWeight: "bold" }}>{t("Seats")}: </span>
                   {values.seatNumber}
                 </Typography>
                 <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>Method: </span>
+                  <span style={{ fontWeight: "bold" }}>{t("Method")}: </span>
                   {values.paymentMethod}
                 </Typography>
                 {values.paymentStatus === "CANCEL" && (
                   <Typography component="span" variant="h5">
-                    <span style={{ fontWeight: "bold" }}>Payment Status: </span>
+                    <span style={{ fontWeight: "bold" }}>{t("Payment Status")}: </span>
                     {values.paymentStatus}ED
                   </Typography>
                 )}
+                
               </Box>
+              
               {/* payment status */}
               {values.paymentStatus !== "CANCEL" && (
                 <FormControl
@@ -142,7 +146,7 @@ const BookingForm = () => {
                   }}
                 >
                   <FormLabel color="warning" id="paymentStatus">
-                    Payment Status
+                    {t("Payment Status")}
                   </FormLabel>
                   <RadioGroup
                     row
@@ -165,7 +169,7 @@ const BookingForm = () => {
                           }}
                         />
                       }
-                      label="UNPAID"
+                      label={t("UNPAID")}
                     />
                     <FormControlLabel
                       value="PAID"
@@ -179,7 +183,7 @@ const BookingForm = () => {
                           }}
                         />
                       }
-                      label="PAID"
+                      label={t("PAID")}
                     />
                   </RadioGroup>
                 </FormControl>
@@ -195,7 +199,7 @@ const BookingForm = () => {
                   loading={updateMutation.isLoading}
                   startIcon={<SaveAsOutlinedIcon />}
                 >
-                  "SAVE"
+                  {t("SAVE")}
                 </LoadingButton>
               </Box>
             </form>

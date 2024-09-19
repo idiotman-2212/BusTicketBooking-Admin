@@ -34,6 +34,7 @@ import { APP_CONSTANTS } from "../../../utils/appContants";
 import { debounce } from "../../../utils/debounce";
 import { handleToast } from "../../../utils/helpers";
 import * as userApi from "../../user/userQueries";
+import { useTranslation } from "react-i18next";
 
 const initialValues = {
   username: "",
@@ -135,6 +136,7 @@ const UserForm = () => {
   const [showPwd, setShowPwd] = useState(false);
   const { username } = useParams();
   const queryClient = useQueryClient();
+const {t} = useTranslation();
 
   // Load user data when mode is EDIT
   const { data } = useQuery({
@@ -158,7 +160,7 @@ const UserForm = () => {
       mutation.mutate(newValues, {
         onSuccess: () => {
           resetForm();
-          handleToast("success", "Add new user successfully");
+          handleToast("success", t("Add new user successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -169,7 +171,7 @@ const UserForm = () => {
       updateMutation.mutate(newValues, {
         onSuccess: (data) => {
           queryClient.setQueryData(["users", username], data);
-          handleToast("success", "Update user successfully");
+          handleToast("success", t("Update user successfully"));
         },
         onError: (error) => {
           console.log(error);
@@ -182,8 +184,8 @@ const UserForm = () => {
   return (
     <Box m="20px">
       <Header
-        title={isAddMode ? "CREATE USER" : "EDIT USER"}
-        subTitle={isAddMode ? "Create user profile" : "Edit user profile"}
+        title={isAddMode ? t("CREATE USER") : t("EDIT USER")}
+        subTitle={isAddMode ? t("Create user profile") : t("Edit user profile")}
       />
       <Formik
         onSubmit={handleFormSubmit}
@@ -218,7 +220,7 @@ const UserForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="First Name"
+                label={t("First Name")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.firstName}
@@ -236,7 +238,7 @@ const UserForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Last Name"
+                label={t("Last Name")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.lastName}
@@ -272,7 +274,7 @@ const UserForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Phone"
+                label={t("Phone")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.phone}
@@ -293,7 +295,7 @@ const UserForm = () => {
                   <DatePicker
                     disabled={!isAddMode}
                     format="dd/MM/yyyy"
-                    label="Day of Birth"
+                    label={t("Day of Birth")}
                     maxDate={new Date()}
                     value={parse(values.dob, "yyyy-MM-dd", new Date())}
                     onChange={(newDate) => {
@@ -334,7 +336,7 @@ const UserForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Address"
+                label={t("Address")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.address}
@@ -352,7 +354,7 @@ const UserForm = () => {
                 }}
               >
                 <FormLabel color="warning" id="gender">
-                  Gender
+                  {t("Gender")}
                 </FormLabel>
                 <RadioGroup
                   row
@@ -365,7 +367,7 @@ const UserForm = () => {
                 >
                   <FormControlLabel
                     value="false"
-                    label="Male"
+                    label={t("Male")}
                     control={
                       <Radio
                         sx={{
@@ -379,7 +381,7 @@ const UserForm = () => {
                   />
                   <FormControlLabel
                     value="true"
-                    label="Female"
+                    label={t("Female")}
                     control={
                       <Radio
                         sx={{
@@ -401,7 +403,7 @@ const UserForm = () => {
                   }}
                 >
                   <FormLabel color="warning" id="active">
-                    Active
+                    {t("Active")}
                   </FormLabel>
                   <RadioGroup
                     row
@@ -424,7 +426,7 @@ const UserForm = () => {
                           }}
                         />
                       }
-                      label="False"
+                      label={t("False")}
                     />
                     <FormControlLabel
                       value="true"
@@ -438,7 +440,7 @@ const UserForm = () => {
                           }}
                         />
                       }
-                      label="True"
+                      label={t("True")}
                     />
                   </RadioGroup>
                 </FormControl>
@@ -450,7 +452,7 @@ const UserForm = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label="Username"
+                label={t("Username")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.username}
@@ -473,12 +475,12 @@ const UserForm = () => {
                     error={!!touched.password && !!errors.password}
                     htmlFor="outlined-adornment-password"
                   >
-                    Password
+                    {t("Password")}
                   </InputLabel>
                   <OutlinedInput
                     id="outlined-adornment-password"
                     type={showPwd ? "text" : "password"}
-                    label="Password"
+                    label={t("Password")}
                     fullWidth
                     onBlur={handleBlur}
                     onChange={handleChange}
@@ -512,7 +514,7 @@ const UserForm = () => {
                 loading={mutation.isLoading || updateMutation.isLoading}
                 startIcon={<SaveAsOutlinedIcon />}
               >
-                {isAddMode ? "CREATE" : "SAVE"}
+                {isAddMode ? t("CREATE") : t("SAVE")}
               </LoadingButton>
             </Box>
           </form>

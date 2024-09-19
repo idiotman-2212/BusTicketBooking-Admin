@@ -32,6 +32,7 @@ import * as provinceApi from "../../global/provinceQueries";
 import * as tripApi from "../../trip/tripQueries";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTranslation } from "react-i18next";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -88,6 +89,7 @@ const TripForm = () => {
   const [coachClicked, setCoachClicked] = useState(false);
   const [provinceClicked, setProvinceClicked] = useState(false);
   const [discountClicked, setDiscountClicked] = useState(false);
+  const {t} = useTranslation();
 
   // prepare data (driver, coach, source, destination, ...) for autocomplete combobox
   const driverQuery = useQuery({
@@ -179,7 +181,7 @@ const TripForm = () => {
       const response = await tripApi.checkRecentTrips(newValues.driver.id, newValues.departureDateTime);
 
       if (response.length > 0) {
-        handleToast("error", "Driver must wait for 2 days before creating a new trip.");
+        handleToast("error", t("Driver must wait for 2 days before creating a new trip."));
         return;
       }
 
@@ -188,7 +190,7 @@ const TripForm = () => {
         mutation.mutate(newValues, {
           onSuccess: () => {
             resetForm();
-            handleToast("success", "Add new trip successfully");
+            handleToast("success", t("Add new trip successfully"));
           },
           onError: (error) => {
             console.error(error);
@@ -199,7 +201,7 @@ const TripForm = () => {
         updateMutation.mutate(newValues, {
           onSuccess: (data) => {
             queryClient.setQueryData(["trips", tripId], data);
-            handleToast("success", "Update trip successfully");
+            handleToast("success", t("Update trip successfully"));
           },
           onError: (error) => {
             console.error(error);
@@ -218,8 +220,8 @@ const TripForm = () => {
   return (
     <Box m="20px">
       <Header
-        title={isAddMode ? "CREATE TRIP" : "EDIT TRIP"}
-        subTitle={isAddMode ? "Create trip profile" : "Edit trip profile"}
+        title={isAddMode ? t("CREATE TRIP") : t("EDIT TRIP")}
+        subTitle={isAddMode ? t("Create trip profile") : t("Edit trip profile")}
       />
       <Formik
         onSubmit={handleFormSubmit}
@@ -296,7 +298,7 @@ const TripForm = () => {
                   <TextField
                     {...params}
                     name="driver"
-                    label="Driver"
+                    label={t("Driver")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -335,7 +337,7 @@ const TripForm = () => {
                   <TextField
                     {...params}
                     name="coach"
-                    label="Coach"
+                    label={t("Coach")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -372,7 +374,7 @@ const TripForm = () => {
                   <TextField
                     {...params}
                     name="source"
-                    label="From"
+                    label={t("From")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -411,7 +413,7 @@ const TripForm = () => {
                   <TextField
                     {...params}
                     name="destination"
-                    label="To"
+                    label={t("To")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -450,7 +452,7 @@ const TripForm = () => {
                   <TextField
                     {...params}
                     name="discount"
-                    label="Available Discount"
+                    label={t("Available Discount")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -479,7 +481,7 @@ const TripForm = () => {
                 fullWidth
                 variant="outlined"
                 type="number"
-                label="Price"
+                label={t("Price")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.price}
@@ -499,7 +501,7 @@ const TripForm = () => {
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DateTimePicker
                     format="HH:mm dd-MM-yyyy"
-                    label="Departure Date Time"
+                    label={t("Departure DateTime")}
                     value={parse(
                       values.departureDateTime,
                       "yyyy-MM-dd HH:mm",
@@ -546,7 +548,7 @@ const TripForm = () => {
                 fullWidth
                 variant="outlined"
                 type="number"
-                label="Duration (hour)"
+                label={t("Duration (hour)")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 value={values.duration}
@@ -606,7 +608,7 @@ const TripForm = () => {
                 loading={mutation.isLoading || updateMutation.isLoading}
                 startIcon={<SaveAsOutlinedIcon />}
               >
-                {isAddMode ? "CREATE" : "SAVE"}
+                {isAddMode ? t("CREATE") : t("SAVE")}
               </LoadingButton>
             </Box>
           </form>
