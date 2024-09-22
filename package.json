@@ -16,6 +16,7 @@
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/list": "^6.1.8",
     "@fullcalendar/timegrid": "^6.1.8",
+    "@kommunicate/kommunicate-chatbot-plugin": "^0.0.7",
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.136",
     "@mui/material": "^5.14.0",
