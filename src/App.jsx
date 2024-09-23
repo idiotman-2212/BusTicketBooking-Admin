@@ -84,23 +84,24 @@ const App = () => {
     },
   });
 
-  useEffect(() => {
-    (function(d, m) {
-      var kommunicateSettings = {
-        "appId": "291034e15da45c3b1f0f79c535bfe8dda", // Thay YOUR_APP_ID bằng App ID của bạn
-        "popupWidget": true,
-        "automaticChatOpenOnNavigation": true
-      };
-      var s = document.createElement("script");
-      s.type = "text/javascript";
-      s.async = true;
-      s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
-      var h = document.getElementsByTagName("head")[0];
-      h.appendChild(s);
-      window.kommunicate = m;
-      m._globals = kommunicateSettings;
-    })(document, window.kommunicate || {});
-  }, []);
+  //Tích hợp chat
+  // useEffect(() => {
+  //   (function(d, m) {
+  //     var kommunicateSettings = {
+  //       "appId": "291034e15da45c3b1f0f79c535bfe8dda", // Thay YOUR_APP_ID bằng App ID của bạn
+  //       "popupWidget": true,
+  //       "automaticChatOpenOnNavigation": true
+  //     };
+  //     var s = document.createElement("script");
+  //     s.type = "text/javascript";
+  //     s.async = true;
+  //     s.src = "https://widget.kommunicate.io/v2/kommunicate.app";
+  //     var h = document.getElementsByTagName("head")[0];
+  //     h.appendChild(s);
+  //     window.kommunicate = m;
+  //     m._globals = kommunicateSettings;
+  //   })(document, window.kommunicate || {});
+  // }, []);
   
   return (
     <ColorModeContext.Provider value={colorMode}>
