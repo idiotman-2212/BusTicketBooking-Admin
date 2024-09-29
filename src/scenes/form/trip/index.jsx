@@ -10,10 +10,14 @@ import {
   TextField,
   useMediaQuery,
   useTheme,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  FormLabel,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import CircularProgress from "@mui/material/CircularProgress";
-import { DateTimePicker, TimePicker } from "@mui/x-date-pickers";
+import { DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -52,6 +56,7 @@ const initialValues = {
   departureDateTime: format(new Date(), "yyyy-MM-dd HH:mm"),
   duration: 0,
   isEditMode: false, // remove this field when submit
+  completed: false, // Trạng thái hoàn thành chuyến đi
 };
 
 const tripSchema = yup.object().shape({
@@ -75,6 +80,7 @@ const tripSchema = yup.object().shape({
   departureDateTime: yup.string().required("Required"),
   duration: yup.number().notRequired(),
   isEditMode: yup.boolean().default(true),
+  completed: yup.boolean().default(false), // Xác định trạng thái hoàn thành
 });
 
 const TripForm = () => {
@@ -89,7 +95,7 @@ const TripForm = () => {
   const [coachClicked, setCoachClicked] = useState(false);
   const [provinceClicked, setProvinceClicked] = useState(false);
   const [discountClicked, setDiscountClicked] = useState(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   // prepare data (driver, coach, source, destination, ...) for autocomplete combobox
   const driverQuery = useQuery({
@@ -116,37 +122,21 @@ const TripForm = () => {
   const handleDriverOpen = () => {
     if (!driverQuery.data) {
       setDriverClicked(true);
-      // queryClient.prefetchQuery({
-      //   queryKey: ["drivers", "all"],
-      //   // queryFn: () => driverApi.getAll(),
-      // });
     }
   };
   const handleCoachOpen = () => {
     if (!coachQuery.data) {
       setCoachClicked(true);
-      // queryClient.prefetchQuery({
-      //   queryKey: ["coaches", "all"],
-      //   // queryFn: () => coachApi.getAll(),
-      // });
     }
   };
   const handleProvinceOpen = () => {
     if (!provinceQuery.data) {
       setProvinceClicked(true);
-      // queryClient.prefetchQuery({
-      //   queryKey: ["provinces", "all"],
-      //   // queryFn: () => provinceApi.getAll(),
-      // });
     }
   };
   const handleDiscountOpen = () => {
     if (!disCountQuery.data) {
       setDiscountClicked(true);
-      // queryClient.prefetchQuery({
-      //   queryKey: ["discounts", "all"],
-      //   // queryFn: () => provinceApi.getAll(),
-      // });
     }
   };
 
@@ -174,48 +164,52 @@ const TripForm = () => {
 
   // HANDLE FORM SUBMIT
   const handleFormSubmit = async (values, { resetForm }) => {
+    console.log("Submitting with values:", values); // Kiểm tra toàn bộ dữ liệu gửi đi, đặc biệt là trường completed
+
     let { isEditMode, ...newValues } = values;
 
     try {
       // Kiểm tra chuyến đi gần đây của tài xế
-      const response = await tripApi.checkRecentTrips(newValues.driver.id, newValues.departureDateTime);
-
-      if (response.length > 0) {
-        handleToast("error", t("Driver must wait for 2 days before creating a new trip."));
-        return;
-      }
-
-      // Thực hiện thao tác tạo hoặc chỉnh sửa nếu không có chuyến đi gần đây
       if (isAddMode) {
-        mutation.mutate(newValues, {
-          onSuccess: () => {
-            resetForm();
-            handleToast("success", t("Add new trip successfully"));
-          },
-          onError: (error) => {
-            console.error(error);
-            handleToast("error", error.response?.data?.message || "An error occurred");
-          },
-        });
-      } else {
-        updateMutation.mutate(newValues, {
-          onSuccess: (data) => {
-            queryClient.setQueryData(["trips", tripId], data);
-            handleToast("success", t("Update trip successfully"));
-          },
-          onError: (error) => {
-            console.error(error);
-            handleToast("error", error.response?.data?.message || "An error occurred");
-          },
-        });
+        const response = await tripApi.checkRecentTrips(
+          newValues.driver.id,
+          newValues.departureDateTime
+        );
+
+        if (response.length > 0) {
+          handleToast(
+            "error",
+            t("Driver must wait for 2 days before creating a new trip.")
+          );
+          return;
+        }
       }
-      queryClient.removeQueries({ queryKey: ["trips"], type: "inactive" });
+
+      // Thực hiện thao tác tạo hoặc chỉnh sửa
+      const action = isAddMode ? mutation.mutateAsync : updateMutation.mutateAsync;
+      await action(newValues, {
+        onSuccess: () => {
+          resetForm();
+          handleToast(
+            "success",
+            isAddMode ? t("Add new trip successfully") : t("Update trip successfully")
+          );
+        },
+        onError: (error) => {
+          console.error(error);
+          handleToast(
+            "error",
+            error.response?.data?.message || "An error occurred"
+          );
+        },
+      });
+
+      queryClient.invalidateQueries(["trips"]); // Refresh cache
     } catch (error) {
-      console.error('Error:', error);
-      handleToast("error", "An error occurred while checking recent trips.");
+      console.error("Error:", error);
+      handleToast("error", "An error occurred while processing the trip.");
     }
   };
-  
 
   return (
     <Box m="20px">
@@ -229,16 +223,8 @@ const TripForm = () => {
           data
             ? {
                 ...data,
-                // id: data.id,
-                // driver: data.driver,
-                // coach: data.coach,
-                // source: data.source,
-                // destination: data.destination,
-                // discount: data.discount,
-                // price: data.price,
-                // departureDateTime: data.departureDateTime,
-                // duration: data.duration,
                 isEditMode: true,
+                completed: data.completed ?? false, // Đảm bảo completed không bị null
               }
             : initialValues
         }
@@ -560,44 +546,29 @@ const TripForm = () => {
                 }}
               />
 
-              {/* <FormControl
-                sx={{
-                  gridColumn: "span 2",
-                }}
-              >
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <TimePicker
-                    format="HH:mm"
-                    label="Arrival Time"
-                    value={parse(values.arrivalTime, "HH:mm", new Date())}
-                    onChange={(newTime) => {
-                      setFieldValue("arrivalTime", format(newTime, "HH:mm"));
-                    }}
-                    slotProps={{
-                      textField: {
-                        InputProps: {
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <CalendarMonthIcon />
-                            </InputAdornment>
-                          ),
-                        },
-                        size: "small",
-                        color: "warning",
-                        error: !!touched.arrivalTime && !!errors.arrivalTime,
-                        helperText: touched.arrivalTime && errors.arrivalTime,
-                      },
-                      dialog: {
-                        sx: {
-                          "& .MuiButtonBase-root": {
-                            color: colors.grey[100],
-                          },
-                        },
-                      },
-                    }}
+              <FormControl>
+                <FormLabel color="warning" id="status">
+                  {t("Trip Status")}
+                </FormLabel>
+                <RadioGroup
+                  row
+                  aria-label="completed"
+                  name="completed"
+                  value={values.completed.toString()}
+                  onChange={(e) => setFieldValue("completed", e.target.value === "true")}
+                >
+                  <FormControlLabel
+                    value="true"
+                    control={<Radio color="primary" />}
+                    label={t("Complete")}
                   />
-                </LocalizationProvider>
-              </FormControl> */}
+                  <FormControlLabel
+                    value="false"
+                    control={<Radio />}
+                    label={t("Incomplete")}
+                  />
+                </RadioGroup>
+              </FormControl>
             </Box>
             <Box mt="20px" display="flex" justifyContent="center">
               <LoadingButton

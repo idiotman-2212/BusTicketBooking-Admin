@@ -1,56 +1,47 @@
-import { React, useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   IconButton,
-  InputBase,
-  useTheme,
-  Tooltip,
   Select,
   MenuItem,
+  useTheme,
 } from "@mui/material";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
-import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import SearchIcon from "@mui/icons-material/Search";
-import { FaFlagUsa } from "react-icons/fa";
-import { FaFlag } from "react-icons/fa";
-import { initReactI18next, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import vietnamFlag from "../../assets/vietnam.png";
 import usaFlag from "../../assets/uk.png";
+import Tooltip from "@mui/material/Tooltip";
 
 const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
   const { t, i18n } = useTranslation();
-  const [language, setLanguage] = useState("en"); // Ngôn ngữ hiện tại
+  const [language, setLanguage] = useState("en"); // Ngôn ngữ mặc định là tiếng Anh
+
+  useEffect(() => {
+    // Đồng bộ ngôn ngữ hiện tại từ i18n khi component được mount
+    setLanguage(i18n.language);
+  }, [i18n.language]);
 
   const changeLanguage = (lgn) => {
     i18n.changeLanguage(lgn);
-    console.log("change language", lgn);
+    setLanguage(lgn); // Cập nhật ngôn ngữ sau khi thay đổi
+    console.log("Language changed to", lgn);
   };
 
-  // Xử lý thay đổi ngôn ngữ
   const handleLanguageChange = (event) => {
     const selectedLanguage = event.target.value;
-    setLanguage(selectedLanguage);
     changeLanguage(selectedLanguage);
   };
 
   return (
     <Box display="flex" justifyContent="end" p={2}>
-      {/* SearchBar */}
-      {/* <Box display="flex" bgcolor={colors.primary[400]} borderRadius="3px">
-        <InputBase sx={{ ml: 2, flex: 1 }} placeholder="Search" />
-        <IconButton type="button" sx={{ p: 1 }}>
-          <SearchIcon />
-        </IconButton>
-      </Box> */}
-
       {/* Icons */}
-      <Box display="flex">
+      <Box display="flex" alignItems="center">
+        {/* Chế độ sáng/tối */}
         <IconButton onClick={colorMode.toggleColorMode}>
           {theme.palette.mode === "light" ? (
             <LightModeOutlinedIcon />
@@ -59,7 +50,7 @@ const Topbar = () => {
           )}
         </IconButton>
 
-        {/* Select chuyển đổi ngôn ngữ */}
+        {/* Select chuyển đổi ngôn ngữ với Tooltip */}
         <Select
           value={language}
           onChange={handleLanguageChange}
@@ -76,22 +67,26 @@ const Topbar = () => {
           }}
         >
           <MenuItem value="vi">
-            <img
-              src={vietnamFlag}
-              alt="Tiếng Việt"
-              width="24" // Kích thước cờ nhỏ vừa
-              height="24"
-              style={{ borderRadius: "50%" }}
-            />
+            <Tooltip title="Tiếng Việt" placement="top">
+              <img
+                src={vietnamFlag}
+                alt="Tiếng Việt"
+                width="24"
+                height="24"
+                style={{ borderRadius: "50%" }}
+              />
+            </Tooltip>
           </MenuItem>
           <MenuItem value="en">
-            <img
-              src={usaFlag}
-              alt="English"
-              width="24" // Kích thước cờ nhỏ vừa
-              height="24"
-              style={{ borderRadius: "50%" }}
-            />
+            <Tooltip title="English" placement="top">
+              <img
+                src={usaFlag}
+                alt="English"
+                width="24"
+                height="24"
+                style={{ borderRadius: "50%" }}
+              />
+            </Tooltip>
           </MenuItem>
         </Select>
       </Box>

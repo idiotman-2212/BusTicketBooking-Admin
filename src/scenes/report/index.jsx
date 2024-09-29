@@ -19,6 +19,7 @@ import * as reportApi from "./reportQueries";
 import { useQuery } from "@tanstack/react-query";
 import BarChart from "../../components/BarChart";
 import PieChart from "../../components/PieChart";
+import { useTranslation } from "react-i18next";
 
 const Report = () => {
   const theme = useTheme();
@@ -27,7 +28,7 @@ const Report = () => {
   const [endDate, setEndDate] = useState(new Date());
   const [timeOption, setTimeOption] = useState("WEEK");
   const [reportOption, setReportOption] = useState("revenue");
-
+  const {t} = useTranslation();
   //lấy doanh thu theo khoảng tg
   const revenueQuery = useQuery({
     queryKey: ["reports", "revenue", startDate, endDate, timeOption],
@@ -38,7 +39,7 @@ const Report = () => {
         timeOption
       ),
     keepPreviousData: true,
-    enabled: timeOption !== "WEEK",
+    enabled: reportOption === "revenue" && timeOption !== "WEEK",
   });
 
   //lấy doanh thu theo tuần
@@ -47,7 +48,7 @@ const Report = () => {
     queryFn: () =>
       reportApi.getTotalWeekRevenue(format(startDate, "yyyy-MM-dd")),
     keepPreviousData: true,
-    enabled: timeOption === "WEEK",
+    enabled: reportOption === "revenue" && timeOption === "WEEK",
   });
 
   //lấy xe đã sử dụng trong khoảng tg
@@ -55,9 +56,9 @@ const Report = () => {
     queryKey: ["reports", "coachUsage", startDate, endDate, timeOption],
     queryFn: () =>
       reportApi.getCoachUsage(
-        format(new Date(), "yyyy-MM-dd"),
-        format(new Date(), "yyyy-MM-dd"),
-        "MONTH"
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd"),
+        timeOption
       ),
     keepPreviousData: true,
     enabled: reportOption === "coachUsage",
@@ -68,9 +69,9 @@ const Report = () => {
     queryKey: ["reports", "topRoute", startDate, endDate, timeOption],
     queryFn: () =>
       reportApi.getTopRoute(
-        format(new Date(), "yyyy-MM-dd"),
-        format(new Date(), "yyyy-MM-dd"),
-        "MONTH"
+        format(startDate, "yyyy-MM-dd"),
+        format(endDate, "yyyy-MM-dd"),
+        timeOption
       ),
     keepPreviousData: true,
     enabled: reportOption === "top5Route",
@@ -91,7 +92,7 @@ const Report = () => {
 
   return (
     <Box m="20px">
-      <Header title="Report" subTitle="Admin Report" />
+      <Header title={t("Report")} subTitle={t("Admin Report")} />
 
       <Box
         display="flex"
@@ -101,7 +102,7 @@ const Report = () => {
       >
         {/* Report Option */}
         <FormControl size="small" color="warning">
-          <InputLabel id="reportOption">Report Option</InputLabel>
+          <InputLabel id="reportOption">{t("Report Option")}</InputLabel>
           <Select
             labelId="reportOption"
             id="report-option-select"
@@ -111,9 +112,9 @@ const Report = () => {
               setReportOption(e.target.value);
             }}
           >
-            <MenuItem value={"revenue"}>Revenue</MenuItem>
-            <MenuItem value={"coachUsage"}>Coach Usage</MenuItem>
-            <MenuItem value={"top5Route"}>Top 5 Route</MenuItem>
+            <MenuItem value={"revenue"}>{t("Revenue")}</MenuItem>
+            <MenuItem value={"coachUsage"}>{t("Coach Usage")}</MenuItem>
+            <MenuItem value={"top5Route"}>{t("Top 5 Route")}</MenuItem>
           </Select>
         </FormControl>
 
@@ -123,7 +124,7 @@ const Report = () => {
             <DatePicker
               format="dd/MM/yyyy"
               views={getDatePickerViews(timeOption)}
-              label="From"
+              label={t("From")}
               value={startDate}
               maxDate={endDate}
               onChange={(newDateTime) => {
@@ -161,7 +162,7 @@ const Report = () => {
               views={getDatePickerViews(timeOption)}
               disabled={timeOption === "WEEK"}
               format="dd/MM/yyyy"
-              label="To"
+              label={t("To")}
               minDate={startDate}
               maxDate={new Date()}
               value={endDate}
@@ -195,7 +196,7 @@ const Report = () => {
 
         {/* Time Option */}
         <FormControl size="small" color="warning">
-          <InputLabel id="timeOption">Time Option</InputLabel>
+          <InputLabel id="timeOption">{t("Time Option")}</InputLabel>
           <Select
             labelId="timeOption"
             id="time-option-select"
@@ -206,9 +207,9 @@ const Report = () => {
             }}
           >
             {/* <MenuItem value={"DAY"}>Day</MenuItem> */}
-            <MenuItem value={"WEEK"}>Week</MenuItem>
-            <MenuItem value={"MONTH"}>Month</MenuItem>
-            <MenuItem value={"YEAR"}>Year</MenuItem>
+            <MenuItem value={"WEEK"}>{t("Week")}</MenuItem>
+            <MenuItem value={"MONTH"}>{t("Month")}</MenuItem>
+            <MenuItem value={"YEAR"}>{t("Year")}</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -227,12 +228,12 @@ const Report = () => {
             <>
               {timeOption !== "WEEK" && revenueQuery.isSuccess ? (
                 <BarChart
-                  title="Revenue"
+                  title={t("Revenue")}
                   entries={revenueQuery?.data.reportData}
                 />
               ) : weekRevenueQuery.isSuccess ? (
                 <BarChart
-                  title="Revenue"
+                  title={t("Revenue")}
                   entries={weekRevenueQuery?.data.reportData}
                 />
               ) : undefined}
@@ -242,7 +243,7 @@ const Report = () => {
             <>
               {coachUsageQuery.isSuccess && (
                 <PieChart
-                  title="Coach Usage"
+                  title={t("Coach Usage")}
                   entries={coachUsageQuery?.data.reportData}
                 />
               )}
@@ -252,7 +253,7 @@ const Report = () => {
             <>
               {topRouteQuery.isSuccess && (
                 <BarChart
-                  title="Top 5 Route"
+                  title={t("Top 5 Route")}
                   entries={topRouteQuery?.data.reportData}
                 />
               )}

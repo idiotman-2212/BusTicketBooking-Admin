@@ -72,6 +72,7 @@ const {t} = useTranslation();
     enabled: selectedRow !== "",
   });
 
+
   // const userQuery = useQuery({
   //   queryKey: ["users", selectedUser],
   //   queryFn: () => userApi.getUser(selectedUser),
@@ -89,11 +90,12 @@ const {t} = useTranslation();
     () => [
       {
         header: t("Customer"),
-        accessorKey: "user",
-        footer: "Customer",
+        accessorKey: "custFirstName",
+        footer: "First Name",
         width: 150,
         maxWidth: 250,
         isEllipsis: true,
+        filterFn: 'includesString',  // Áp dụng hàm lọc theo chuỗi
         cell: (info) => {
           const { custFirstName, custLastName } = info.row.original;
           return (
@@ -841,7 +843,7 @@ const {t} = useTranslation();
           >
             <Button
               variant="contained"
-              color="error"
+              color="success"
               startIcon={<CheckIcon />}
               onClick={() => handleDeleteBooking(selectedRow)}
             >
@@ -849,7 +851,7 @@ const {t} = useTranslation();
             </Button>
             <Button
               variant="contained"
-              color="success"
+              color="error"
               startIcon={<ClearIcon />}
               onClick={() => setOpenModal(!openModal)}
             >

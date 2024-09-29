@@ -5,6 +5,9 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
+import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+
 import {
   Box,
   Button,
@@ -119,7 +122,22 @@ const Trip = () => {
         width: 150,
         maxWidth: 200,
         align: "center",
-      },      
+      },     
+      {
+        header: t("Completed"),
+        accessorKey: "completed",
+        footer: "Completed",
+        width: 100,
+        maxWidth: 150,
+        align: "center",
+        cell: (info) =>
+          info.getValue() ? (
+            <CheckOutlinedIcon sx={{ color: "#00e330" }} /> // Màu xanh cho dấu tick
+          ) : (
+            <CloseIcon sx={{ color: "#eb0014" }} /> // Màu đỏ cho dấu x
+          ),
+      },
+       
       {
         header: t("Action"),
         accessorKey: "action",

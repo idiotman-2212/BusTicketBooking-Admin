@@ -25,6 +25,11 @@ const getTrip = async (tripId) => {
     return resp.data
 }
 
+const completeTrip = async (tripId) => {
+    const resp = await http.put(`/trips/${tripId}/complete`);
+    return resp.data;
+}
+
 const createNewTrip = async (newTrip) => {
     const resp = await http.post("/trips", newTrip)
     return resp.data
@@ -59,6 +64,6 @@ const checkRecentTrips = async (driverId, departureDateTime) => {
 
 export {
     createNewTrip, deleteTrip, getAll, getPageOfTrips,
-    getTrip, updateTrip, findAllTripBySourceAndDest, checkRecentTrips
+    getTrip, updateTrip, findAllTripBySourceAndDest, checkRecentTrips, completeTrip
 };
 

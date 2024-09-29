@@ -226,7 +226,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                     }}
                   />
                 }
-                label="CASH"
+                label={t("CASH")}
               />
               {/* <FormControlLabel
                 value="CARD"

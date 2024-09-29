@@ -54,7 +54,7 @@
   "Week Revenue": "Doanh thu tuần",
   "Coach usage": "Chuyến xe đã sử dụng",
   "Code": "Mã",
-  "Amount": "Số lượng",
+  "Amount": "Giá giảm",
   "From": "Từ ngày",
   "To": "Đến ngày",
   "State": "Trạng thái",
@@ -175,6 +175,16 @@
   "CREATE USER" : "TẠO NGƯỜI DÙNG",
   "EDIT USER" : "SỬA NGƯỜI DÙNG",
   "Create user profile" : "Tạo thông tin người dùng",
-  "Edit user profile" : "Sửa thông tin người dùng"
-
+  "Edit user profile" : "Sửa thông tin người dùng",
+  "CASH": "TIỀN MẶT",
+    "Buy with Account": "Mua với tài khoản",
+    "Admin Report":"Báo cáo của Quản trị viên",
+"Revenue": "Doanh thu",
+"Coach Usage":"Chuyến xe đã sử dụng",
+"Top 5 Route":"Top 5 Tuyến đường",
+"Report Option":"Tùy chọn báo cáo",
+"Time Option":"Tùy chọn Thời gian",
+"Week":"Tuần",
+"Month":"Tháng",
+"Year": "Năm"
 }
