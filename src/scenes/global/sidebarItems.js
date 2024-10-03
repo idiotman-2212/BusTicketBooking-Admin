@@ -6,6 +6,7 @@ import DiscountOutlinedIcon from "@mui/icons-material/DiscountOutlined";
 import ReportOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import AccessibleIcon from '@mui/icons-material/Accessible';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import { useTranslation } from "react-i18next";
 
 export const sidebarItems = () => {
@@ -48,9 +49,15 @@ export const sidebarItems = () => {
             icon: PeopleAltOutlinedIcon
         },
         {
+            title: t('Notifications'),
+            to: '/notifications',
+            icon: NotificationsOutlinedIcon
+        },
+        {
             title: t('Report'),
             to: '/reports',
             icon: ReportOutlinedIcon
         },
+        
     ];
 };

@@ -15,6 +15,11 @@ const getPageOfUser = async (page, limit) => {
     return resp.data;
 }
 
+const getAllUsers = async () => {
+      const response = await http.get('/users/all'); 
+      return response.data;
+  };
+
 const getUser = async (username) => {
     const resp = await http.get(`/users/${username}`)
     return resp.data
@@ -53,5 +58,5 @@ const checkDuplicateUserInfo = async (mode, userId, field, value) => {
 
 export {
     getAll, getPageOfUser, getUser, getUserPermission, updateUserPermission
-    , createNewUser, updateUser, deleteUser, checkDuplicateUserInfo
+    , createNewUser, updateUser, deleteUser, checkDuplicateUserInfo, getAllUsers
 }

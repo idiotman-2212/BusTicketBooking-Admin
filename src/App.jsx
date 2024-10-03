@@ -31,9 +31,12 @@ import useLogin from "./utils/useLogin";
 import ChangePassword from "./scenes/ChangePassword";
 import ForgotPwd from "./scenes/ForgotPwd";
 import "./utils/i18n"; // Import cấu hình i18n
-import { useEffect } from 'react';
+import { useEffect } from "react";
+import Notification from "./scenes/notification";
+import NotificationForm from "./scenes/form/notification";
+import Notifications from "./scenes/notification";
 
-//kiểm tra quyền người dùng 
+//kiểm tra quyền người dùng
 const hasReadAccessRoleToScreen = (permissions, pathname) => {
   const roleKeys = Object.keys(permissions);
   // admin is allowed to access all resources
@@ -102,7 +105,7 @@ const App = () => {
   //     m._globals = kommunicateSettings;
   //   })(document, window.kommunicate || {});
   // }, []);
-  
+
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
@@ -152,6 +155,14 @@ const App = () => {
                     <Route index element={<User />} />
                     <Route path=":username" element={<UserForm />} />
                     <Route path="new" element={<UserForm />} />
+                  </Route>
+                  <Route path="/notifications">
+                    <Route index element={<Notifications />} />
+                    <Route
+                      path=":notificationId"
+                      element={<NotificationForm />}
+                    />
+                    <Route path="new" element={<NotificationForm />} />
                   </Route>
                 </Route>
               </Routes>
