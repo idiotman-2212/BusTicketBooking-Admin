@@ -1,146 +1,238 @@
-import React, { useState, useEffect } from 'react';
-import { createNotification, updateNotification } from '../../notification/notificationQueries';
-import { getAllUsers } from '../../user/userQueries'; // Sử dụng getAllUsers từ userQueries
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
 import {
-  Button, TextField, MenuItem, Select, InputLabel, FormControl, Box, Typography
-} from '@mui/material';
+  Box,
+  Button,
+  Checkbox,
+  FormControl,
+  FormHelperText,
+  InputLabel,
+  ListItemText,
+  MenuItem,
+  OutlinedInput,
+  Radio,
+  RadioGroup,
+  Select,
+  Typography,
+  FormLabel,
+  FormControlLabel,
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
+import { Formik } from "formik";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import * as notificationApi from "../../../scenes/notification/notificationQueries";
+import { getAllUsers } from "../../user/userQueries";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const NotificationForm = () => {
-  const [title, setTitle] = useState('');
-  const [message, setMessage] = useState('');
-  const [recipientType, setRecipientType] = useState('ALL');
-  const [recipientIdentifiers, setRecipientIdentifiers] = useState([]);
-  const [users, setUsers] = useState([]); // Lưu danh sách người dùng để chọn
-  const { notificationId } = useParams();  // Nhận notificationId từ URL
-  const location = useLocation();
-  const navigate = useNavigate();
-  const notification = location.state?.notification;
+  const { notificationId } = useParams();
+  const [users, setUsers] = useState([]);
+  const [initialValues, setInitialValues] = useState({
+    title: "",
+    message: "",
+    recipientType: "GROUP",
+    recipientIdentifiers: [],
+  });
 
-  // Kiểm tra xem đang trong chế độ cập nhật hay thêm mới
-  const isEditMode = Boolean(notificationId);
+  // Fetch users
+  const { data: usersData } = useQuery(["users"], getAllUsers, {
+    onSuccess: (data) => setUsers(data),
+  });
 
-  // Fetch danh sách người dùng khi component mount
-  useEffect(() => {
-    fetchUsers();
-
-    // Nếu đang trong chế độ chỉnh sửa, load dữ liệu của notification
-    if (isEditMode && notification) {
-      setTitle(notification.title);
-      setMessage(notification.message);
-      setRecipientType(notification.recipientType);
-      setRecipientIdentifiers(notification.recipientIdentifiers.split(',')); // Chuyển chuỗi thành mảng
+  // Fetch notification data if notificationId is passed (for updating)
+  const { data: notificationData, isLoading } = useQuery(
+    ["notification", notificationId],
+    () => notificationApi.getNotificationById(notificationId),
+    {
+      enabled: !!notificationId,
+      onSuccess: (data) => {
+        setInitialValues({
+          title: data.title || "",
+          message: data.message || "",
+          recipientType: data.recipientType || "GROUP",
+          recipientIdentifiers: data.recipientIdentifiers ? data.recipientIdentifiers.split(',') : [],
+        });
+      },
     }
-  }, [notification, isEditMode]);
+  );
 
-  // Sử dụng getAllUsers từ userQueries để lấy danh sách người dùng
-  const fetchUsers = async () => {
-    const data = await getAllUsers(); // Thay thế bằng getAllUsers
-    setUsers(data); // Lưu danh sách người dùng để sử dụng trong Select
+  // Custom validation logic
+  const validate = (values) => {
+    const errors = {};
+    if (!values.title) {
+      errors.title = "Title is required";
+    }
+    if (!values.message) {
+      errors.message = "Message is required";
+    }
+    if (values.recipientType === "GROUP") {
+      if (!values.recipientIdentifiers.length) {
+        errors.recipientIdentifiers = "At least one recipient must be selected";
+      }
+    }
+    return errors;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const notificationData = {
-      title,
-      message,
-      recipientType,
-      recipientIdentifiers,
-    };
+  // Handle form submission
+  const mutation = useMutation({
+    mutationFn: (values) => {
+      if (notificationId) {
+        // Cập nhật thông báo
+        return notificationApi.updateNotification(notificationId, values);
+      } else {
+        // Tạo mới thông báo
+        return notificationApi.createNotification(values);
+      }
+    },
+    onSuccess: () => {
+      toast.success(notificationId ? "Notification updated successfully!" : "Notification created successfully!"); 
+    },
+    onError: (error) => {
+      toast.error(error.response?.data.message || "Something went wrong!");
+    },
+  });
 
-    if (isEditMode) {
-      // Gọi API update nếu đang chỉnh sửa
-      await updateNotification(notificationId, notificationData);
-    } else {
-      // Gọi API create nếu đang tạo mới
-      await createNotification(notificationData);
-    }
-    navigate('/notifications');
-  };
-
-  // Hàm hiển thị các trường dựa trên Recipient Type
-  const renderRecipientsInput = () => {
-    if (recipientType === 'INDIVIDUAL') {
-      return (
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Individual Recipient</InputLabel>
-          <Select
-            value={recipientIdentifiers[0] || ''} // Chỉ cho phép chọn 1 người cho INDIVIDUAL
-            onChange={(e) => setRecipientIdentifiers([e.target.value])}
-          >
-            {users.map(user => (
-              <MenuItem key={user.username} value={user.username}>
-                {user.username}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      );
-    } else if (recipientType === 'GROUP') {
-      return (
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Group Recipients</InputLabel>
-          <Select
-            multiple // Cho phép chọn nhiều người cho GROUP
-            value={recipientIdentifiers}
-            onChange={(e) => setRecipientIdentifiers(e.target.value)} // Cập nhật mảng các giá trị
-            renderValue={(selected) => selected.join(', ')} // Hiển thị người dùng đã chọn
-          >
-            {users.map(user => (
-              <MenuItem key={user.username} value={user.username}>
-                {user.username}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      );
-    }
-    return null; // Không cần trường recipient nếu là ALL
+  const handleSubmit = (values, { setSubmitting }) => {
+    mutation.mutate(values, {
+      onSuccess: () => {
+        setSubmitting(false);
+        // Xử lý thành công (ví dụ: hiển thị thông báo thành công hoặc điều hướng về danh sách thông báo)
+      },
+      onError: () => {
+        setSubmitting(false);
+        // Xử lý lỗi (ví dụ: hiển thị thông báo lỗi)
+      },
+    });
   };
 
   return (
-    <Box>
-      <Typography variant="h4" gutterBottom>
-        {isEditMode ? 'Update Notification' : 'Create New Notification'}
+    <Box m="20px">
+      <Typography variant="h4" mb={2}>
+        {notificationId ? "Update Notification" : "Create Notification"}
       </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <TextField
-          fullWidth
-          label="Title"
-          variant="outlined"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          margin="normal"
-          required
-        />
-        <TextField
-          fullWidth
-          label="Message"
-          variant="outlined"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          margin="normal"
-          required
-        />
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Recipient Type</InputLabel>
-          <Select
-            value={recipientType}
-            onChange={(e) => setRecipientType(e.target.value)}
-          >
-            <MenuItem value="ALL">ALL</MenuItem>
-            <MenuItem value="GROUP">GROUP</MenuItem>
-            <MenuItem value="INDIVIDUAL">INDIVIDUAL</MenuItem>
-          </Select>
-        </FormControl>
+      <Formik
+          initialValues={initialValues}
+          validate={validate}
+          enableReinitialize={true}
+          onSubmit={handleSubmit}
+        >
+        {({
+          values,
+          errors,
+          touched,
+          handleChange,
+          handleBlur,
+          setFieldValue,
+          handleSubmit,
+          isSubmitting,
+        }) => (
+          <form onSubmit={handleSubmit}>
+            <Box display="grid" gap="30px" gridTemplateColumns="repeat(4, 1fr)">
+              <FormControl sx={{ gridColumn: "span 4" }}>
+                <InputLabel>Title</InputLabel>
+                <OutlinedInput
+                  name="title"
+                  value={values.title}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.title && Boolean(errors.title)}
+                />
+                {!!errors.title && (
+                  <FormHelperText error>{errors.title}</FormHelperText>
+                )}
+              </FormControl>
 
-        {renderRecipientsInput()}
+              <FormControl sx={{ gridColumn: "span 4" }}>
+                <InputLabel>Message</InputLabel>
+                <OutlinedInput
+                  name="message"
+                  multiline
+                  rows={4}
+                  value={values.message}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.message && Boolean(errors.message)}
+                />
+                {!!errors.message && (
+                  <FormHelperText error>{errors.message}</FormHelperText>
+                )}
+              </FormControl>
 
-        <Button variant="contained" color="primary" type="submit">
-          {isEditMode ? 'SAVE' : 'CREATE'}
-        </Button>
-      </form>
+              <FormControl sx={{ gridColumn: "span 4" }}>
+                <FormLabel>Recipient Type</FormLabel>
+                <RadioGroup
+                  row
+                  name="recipientType"
+                  value={values.recipientType}
+                  onChange={(e) => {
+                    setFieldValue("recipientType", e.target.value);
+                    if (e.target.value === "ALL") {
+                      setFieldValue("recipientIdentifiers", []); // Reset khi chọn ALL
+                    }
+                  }}
+                >
+                  <FormControlLabel
+                    value="GROUP"
+                    control={<Radio />}
+                    label="Group"
+                  />
+                  <FormControlLabel
+                    value="ALL"
+                    control={<Radio />}
+                    label="All Users"
+                  />
+                </RadioGroup>
+              </FormControl>
+
+              {values.recipientType === "GROUP" && (
+                <FormControl fullWidth sx={{ gridColumn: "span 4" }}>
+                  <InputLabel>Select Users</InputLabel>
+                  <Select
+                    multiple
+                    value={Array.isArray(values.recipientIdentifiers) ? values.recipientIdentifiers : []}
+                    onChange={(e) => setFieldValue("recipientIdentifiers", e.target.value)}
+                    input={<OutlinedInput />}
+                    renderValue={(selected) =>
+                      Array.isArray(selected)
+                        ? selected.join(", ")
+                        : ""
+                    }
+                  >
+                    {users?.map((user) => (
+                      <MenuItem key={user.username} value={user.username}>
+                        <Checkbox
+                          checked={values.recipientIdentifiers.includes(user.username)}
+                        />
+                        <ListItemText primary={user.username} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {!!errors.recipientIdentifiers && (
+                    <FormHelperText error>
+                      {errors.recipientIdentifiers}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              )}
+            </Box>
+
+            <Box mt="20px" display="flex" justifyContent="center">
+              <LoadingButton
+                color="secondary"
+                type="submit"
+                variant="contained"
+                loadingPosition="start"
+                loading={isSubmitting}
+                startIcon={<SaveAsOutlinedIcon />}
+              >
+                {notificationId ? "UPDATE" : "CREATE"}
+              </LoadingButton>
+            </Box>
+          </form>
+        )}
+      </Formik>
     </Box>
   );
 };

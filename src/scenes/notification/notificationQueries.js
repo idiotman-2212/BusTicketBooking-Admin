@@ -11,6 +11,11 @@ export const getPageOfNotification = async (page, limit) => {
   return response.data;
 };
 
+export const getAll = async () => {
+  const resp = await http.get("/notifications/all")
+  return resp.data
+}
+
 // Lấy thông báo theo ID
 export const getNotificationById = async (id) => {
   const response = await http.get(`/notifications/${id}`);

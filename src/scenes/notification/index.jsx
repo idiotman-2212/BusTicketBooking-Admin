@@ -1,6 +1,5 @@
 import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
-import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import SearchIcon from "@mui/icons-material/Search";
@@ -14,11 +13,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  getCoreRowModel,
-  getFilteredRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { getCoreRowModel, getFilteredRowModel, useReactTable } from "@tanstack/react-table";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomDataTable from "../../components/CustomDataTable";
@@ -28,7 +23,6 @@ import { tokens } from "../../theme";
 import { handleToast } from "../../utils/helpers";
 import { useQueryString } from "../../utils/useQueryString";
 import * as notificationApi from "./notificationQueries";
-import { hasPermissionToDoAction } from "../../utils/CrudPermission";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
 
 const Notifications = () => {
@@ -39,10 +33,8 @@ const Notifications = () => {
   const [selectedRow, setSelectedRow] = useState("");
   const [filtering, setFiltering] = useState("");
   const queryClient = useQueryClient();
-  const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
-  const [forbiddenMessage, setForbiddenMessage] = useState("");
 
-  // Columns
+  // Cấu trúc cột cho bảng thông báo
   const columns = useMemo(
     () => [
       {
@@ -68,6 +60,12 @@ const Notifications = () => {
         width: 180,
         maxWidth: 250,
         isEllipsis: true,
+        filterFn: (row, columnId, filterValue) => {
+          const recipientIds = Array.isArray(row.original.recipientIdentifiers)
+            ? row.original.recipientIdentifiers
+            : row.original.recipientIdentifiers.split(',').map(id => id.trim()); // Tách chuỗi và loại bỏ khoảng trắng
+          return recipientIds.some(id => id.includes(filterValue));
+        },
       },
       {
         header: "Recipient Type",
@@ -76,6 +74,8 @@ const Notifications = () => {
         width: 100,
         maxWidth: 150,
         align: "center",
+        filterFn: 'includesString',
+        //filterFn: 'equalsString',
       },
       {
         header: "Send Date/Time",
@@ -85,8 +85,7 @@ const Notifications = () => {
         maxWidth: 250,
         isEllipsis: true,
         align: "center",
-        cell: (info) =>
-          new Date(info.getValue()).toLocaleString(),
+        cell: (info) => new Date(info.getValue()).toLocaleString(),
       },
       {
         header: "Action",
@@ -95,30 +94,20 @@ const Notifications = () => {
         width: 120,
         maxWidth: 250,
         align: "center",
-        cell: (info) => {
-          return (
-            <Box>
-              <CustomToolTip title="Edit" placement="top">
-                <IconButton
-                  onClick={() => {
-                    handleOpenUpdateForm(info.row.original.id);
-                  }}
-                >
-                  <EditOutlinedIcon />
-                </IconButton>
-              </CustomToolTip>
-              <CustomToolTip title="Delete" placement="top">
-                <IconButton
-                  onClick={() => {
-                    handleOpenDeleteForm(info.row.original.id);
-                  }}
-                >
-                  <DeleteOutlineOutlinedIcon />
-                </IconButton>
-              </CustomToolTip>
-            </Box>
-          );
-        },
+        cell: (info) => (
+          <Box>
+            <CustomToolTip title="Edit" placement="top">
+              <IconButton onClick={() => handleOpenUpdateForm(info.row.original.id)}>
+                <EditOutlinedIcon />
+              </IconButton>
+            </CustomToolTip>
+            <CustomToolTip title="Delete" placement="top">
+              <IconButton onClick={() => handleOpenDeleteForm(info.row.original.id)}>
+                <DeleteOutlineOutlinedIcon />
+              </IconButton>
+            </CustomToolTip>
+          </Box>
+        ),
       },
     ],
     []
@@ -133,7 +122,7 @@ const Notifications = () => {
     pageSize: limit,
   });
 
-  // Get page of Notifications
+  // Get page of Users
   const { data } = useQuery({
     queryKey: ["notifications", pagination],
     queryFn: () => {
@@ -141,45 +130,53 @@ const Notifications = () => {
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
       });
-      return notificationApi.getPageOfNotification(
-        pagination.pageIndex,
-        pagination.pageSize
-      );
+      return notificationApi.getPageOfNotification(pagination.pageIndex, pagination.pageSize);
     },
     keepPreviousData: true,
   });
 
+  const prefetchAllNotifications = async () => {
+    await queryClient.prefetchQuery({
+      queryKey: ["notifications", "all"],
+      queryFn: () => notificationApi.getAll(),
+    });
+  };
+
+
+  // Điều hướng tới form tạo mới thông báo
   const handleOpenAddNewForm = () => {
     navigate("new");
   };
 
-  const handleOpenUpdateForm = (selectedRow) => {
-    navigate(`${selectedRow}`);
+  // Điều hướng tới form chỉnh sửa thông báo
+  const handleOpenUpdateForm = (notificationId) => {
+    navigate(`/notifications/edit/${notificationId}`);
   };
 
-  const handleOpenDeleteForm = (selectedRow) => {
-    setSelectedRow(selectedRow);
-    setOpenModal(!openModal);
+  // Mở modal xóa thông báo
+  const handleOpenDeleteForm = (notificationId) => {
+    setSelectedRow(notificationId);
+    setOpenModal(true);
   };
 
+  // Mutation xóa thông báo
   const deleteMutation = useMutation({
     mutationFn: (notificationId) => notificationApi.deleteNotification(notificationId),
+    onSuccess: () => {
+      setOpenModal(false);
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      handleToast("success", "Notification deleted successfully");
+    },
+    onError: (error) => {
+      handleToast("error", error.response?.data.message || "Delete failed");
+    },
   });
 
-  // Handle delete Notification
-  const handleDeleteNotification = (notificationId) => {
-    deleteMutation.mutate(notificationId, {
-      onSuccess: () => {
-        setOpenModal(!openModal);
-        queryClient.invalidateQueries({ queryKey: ["notifications", pagination] });
-        handleToast("success", "Notification deleted successfully");
-      },
-      onError: (error) => {
-        handleToast("error", error.response?.data.message);
-      },
-    });
+  const handleDeleteNotification = () => {
+    deleteMutation.mutate(selectedRow);
   };
 
+  // Cấu hình bảng thông báo
   const table = useReactTable({
     data: data?.dataList ?? [],
     columns,
@@ -200,7 +197,7 @@ const Notifications = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="NOTIFICATIONS" subTitle="Notification management" />
 
-        {/*Table search input */}
+        {/* Ô tìm kiếm trong bảng */}
         <Box
           width="350px"
           height="40px"
@@ -230,17 +227,17 @@ const Notifications = () => {
         </Button>
       </Box>
 
-      {/* Table */}
+      {/* Bảng thông báo */}
       <CustomDataTable
         table={table}
         colors={colors}
         totalElements={data?.totalElements}
       />
 
-      {/* MODAL */}
+      {/* Modal xóa thông báo */}
       <Modal
         open={openModal}
-        onClose={() => setOpenModal(!openModal)}
+        onClose={() => setOpenModal(false)}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -264,24 +261,25 @@ const Notifications = () => {
             justifyContent="center"
             alignItems="center"
           >
-            <WarningRoundedIcon sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }} />
+            <WarningRoundedIcon
+              sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }}
+            />
             Delete Notification&nbsp;
-            <span style={{ fontStyle: "italic" }}>{selectedRow} ?</span>
+            <span style={{ fontStyle: "italic" }}>{selectedRow}?</span>
           </Typography>
           <Box sx={{ mt: 3 }} display="flex" justifyContent="space-around">
             <Button
               variant="contained"
               color="success"
               startIcon={<CheckIcon />}
-              onClick={() => handleDeleteNotification(selectedRow)}
+              onClick={handleDeleteNotification}
             >
               Confirm
             </Button>
             <Button
               variant="contained"
               color="error"
-              startIcon={<CheckIcon />}
-              onClick={() => setOpenModal(!openModal)}
+              onClick={() => setOpenModal(false)}
             >
               Cancel
             </Button>

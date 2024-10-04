@@ -156,13 +156,19 @@ const App = () => {
                     <Route path=":username" element={<UserForm />} />
                     <Route path="new" element={<UserForm />} />
                   </Route>
-                  <Route path="/notifications">
+                  {/* <Route path="/notifications">
                     <Route index element={<Notifications />} />
                     <Route
                       path=":notificationId"
-                      element={<NotificationForm />}
+                      element={<NotificationForm />} // Chỉnh sửa thông báo với notificationId
                     />
                     <Route path="new" element={<NotificationForm />} />
+                  </Route> */}
+
+                  <Route path="/notifications">
+                    <Route index element={<Notifications />} />
+                    <Route path="new" element={<NotificationForm />} /> {/* Route cho thêm mới */}
+                    <Route path="edit/:notificationId" element={<NotificationForm />} /> {/* Route cho chỉnh sửa */}
                   </Route>
                 </Route>
               </Routes>
