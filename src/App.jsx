@@ -35,6 +35,8 @@ import { useEffect } from "react";
 import Notification from "./scenes/notification";
 import NotificationForm from "./scenes/form/notification";
 import Notifications from "./scenes/notification";
+import Review from "./scenes/review";
+import ReviewForm from "./scenes/form/review";
 
 //kiểm tra quyền người dùng
 const hasReadAccessRoleToScreen = (permissions, pathname) => {
@@ -156,19 +158,15 @@ const App = () => {
                     <Route path=":username" element={<UserForm />} />
                     <Route path="new" element={<UserForm />} />
                   </Route>
-                  {/* <Route path="/notifications">
-                    <Route index element={<Notifications />} />
-                    <Route
-                      path=":notificationId"
-                      element={<NotificationForm />} // Chỉnh sửa thông báo với notificationId
-                    />
-                    <Route path="new" element={<NotificationForm />} />
-                  </Route> */}
 
                   <Route path="/notifications">
                     <Route index element={<Notifications />} />
                     <Route path="new" element={<NotificationForm />} /> {/* Route cho thêm mới */}
                     <Route path="edit/:notificationId" element={<NotificationForm />} /> {/* Route cho chỉnh sửa */}
+                  </Route>
+                  <Route path="/reviews">
+                    <Route index element={<Review />} /> 
+                    <Route path=":reviewId" element={<ReviewForm />} />
                   </Route>
                 </Route>
               </Routes>

@@ -7,6 +7,7 @@ import ReportOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import AccessibleIcon from '@mui/icons-material/Accessible';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import { useTranslation } from "react-i18next";
 
 export const sidebarItems = () => {
@@ -52,6 +53,11 @@ export const sidebarItems = () => {
             title: t('Notifications'),
             to: '/notifications',
             icon: NotificationsOutlinedIcon
+        },
+        {
+            title: t('Reviews'),
+            to: '/reviews',
+            icon: RateReviewOutlinedIcon
         },
         {
             title: t('Report'),
