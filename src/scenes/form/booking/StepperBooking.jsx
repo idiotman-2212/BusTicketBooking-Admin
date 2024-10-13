@@ -111,47 +111,40 @@ const StepperBooking = () => {
 
   // main process submit form
   const submitForm = (values, actions) => {
-    const {
-      user,
-      source,
-      destination,
-      nameOnCard,
-      cardNumber,
-      expiredDate,
-      cvv,
-      isEditMode,
-      ...newValues
-    } = values;
-
-    actions.setSubmitting(false);
-
-    if (isAddMode) {
-      createMutation.mutate(newValues, {
-        onSuccess: () => {
-          actions.resetForm();
-          handleToast("success", t("Add new Bookings successfully"));
-        },
-        onError: (error) => {
-          console.log(error);
-          handleToast("error", error.response?.data?.message);
-        },
-      });
-    } else {
-    }
-    setActiveStep(0);
-    // handleNext();  // khi nao thanh cong thi chuyen trang success
+    console.log("Submit booking data with cargoRequests: ", values.cargoRequests); // Đảm bảo rằng cargoRequests có dữ liệu
+  
+    createMutation.mutate(values, {
+      onSuccess: () => {
+        actions.resetForm();
+        handleToast("success", t("Add new Bookings successfully"));
+      },
+      onError: (error) => {
+        console.log("Error from backend: ", error);
+        handleToast("error", error.response?.data?.message || "Unexpected error");
+      },
+    });
   };
+  
 
   // handle submit
   const handleFormSubmit = (values, actions) => {
+    // Đồng bộ hóa cargoRequests từ bookingData vào values
+    const updatedValues = {
+        ...values,
+        cargoRequests: bookingData.cargoRequests || []
+    };
+
+    console.log("Submit booking data with cargoRequests: ", updatedValues.cargoRequests);
+
     if (isLastStep) {
-      submitForm(values, actions);
+        submitForm(updatedValues, actions);
     } else {
-      handleNext();
-      actions.setSubmitting(false);
-      setBookingData(values);
+        handleNext();
+        actions.setSubmitting(false);
+        setBookingData(updatedValues); // Cập nhật lại vào bookingData để giữ đồng bộ
     }
-  };
+};
+
 
   return (
     <Box m="20px">

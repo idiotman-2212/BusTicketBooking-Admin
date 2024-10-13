@@ -8,6 +8,7 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import AccessibleIcon from '@mui/icons-material/Accessible';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import { useTranslation } from "react-i18next";
 
 export const sidebarItems = () => {
@@ -48,6 +49,11 @@ export const sidebarItems = () => {
             title: t('Users'),
             to: '/users',
             icon: PeopleAltOutlinedIcon
+        },
+        {
+            title: t('Cargos'),
+            to: '/cargos',
+            icon: LocalShippingOutlinedIcon
         },
         {
             title: t('Notifications'),

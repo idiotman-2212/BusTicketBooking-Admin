@@ -10,13 +10,18 @@ import {
   RadioGroup,
   TextField,
   Typography,
+  CircularProgress,
+  Card,
+  Divider,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { format, parse } from "date-fns";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
+import { getAllCargos } from "../../../cargo/cargoQueries";
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat("vi-VN", {
@@ -26,8 +31,13 @@ const formatCurrency = (amount) => {
 };
 
 const getBookingPrice = (trip) => {
+  if (!trip || !trip.price) {
+    return 0; // Giá trị mặc định nếu trip hoặc price không tồn tại
+  }
+
+  // Tính giá sau khi áp dụng chiết khấu
   let finalPrice = trip.price;
-  if (!isNaN(trip?.discount?.amount)) {
+  if (trip.discount && !isNaN(trip.discount.amount)) {
     finalPrice -= trip.discount.amount;
   }
   return finalPrice;
@@ -42,11 +52,47 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const [cardPaymentSelect, setCardPaymentSelect] = useState(
     bookingData.paymentMethod === "CARD" ? true : false
   );
+  const [services, setServices] = useState([]);
+  const { data: cargoList = [], isLoading, error } = useQuery(["cargoList"], getAllCargos);
+
 
   const bookingDate = format(
     parse(bookingDateTime, "yyyy-MM-dd HH:mm", new Date()),
     "dd/MM/yyyy"
   );
+
+  const handleServiceChange = (cargoId, quantity) => {
+    setServices(prevServices => {
+        const updatedServices = prevServices.filter(service => service.cargoId !== cargoId);
+        if (quantity > 0) {
+            updatedServices.push({ cargoId, quantity });
+        }
+        return updatedServices;
+    });
+};
+
+useEffect(() => {
+  const additionalCost = services.reduce((sum, service) => {
+    const cargo = cargoList.find((c) => c.id === service.cargoId);
+    return sum + (cargo ? cargo.basePrice * service.quantity : 0);
+  }, 0);
+
+  setBookingData((prevData) => {
+    const updatedData = {
+      ...prevData,
+      totalPayment: getBookingPrice(trip) * seatNumber.length + additionalCost,
+      cargoRequests: services.map((service) => ({
+        cargoId: service.cargoId,
+        quantity: service.quantity,
+      })),
+    };
+
+    console.log("Updated bookingData: ", updatedData); // Kiểm tra dữ liệu cập nhật
+    return updatedData;
+  });
+}, [services, setBookingData, trip, seatNumber.length]);
+
+
 
   return (
     <>
@@ -92,6 +138,45 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             {seatNumber.join(", ")}
           </Typography>
         </Box>
+
+        {/* Choose Additional Services */}
+        <Box width="50%">
+          <Typography variant="h5" fontWeight="bold" mb="10px">
+            {t("Choose Additional Services")}
+          </Typography>
+
+          {/* Dịch vụ hiển thị dưới dạng danh sách có thể cuộn */}
+          <Box
+            maxHeight="200px"
+            overflow="auto"
+            display="flex"
+            flexDirection="column"
+            gap="10px"
+            mb="20px"
+          >
+            {cargoList.map((cargo) => (
+    <Card key={cargo.id} variant="outlined" sx={{ p: 2, display: "flex", alignItems: "center" }}>
+        <Typography style={{ width: "60%" }}>{cargo.name} - {formatCurrency(cargo.basePrice)}</Typography>
+        <TextField
+            type="number"
+            size="small"
+            value={services.find(service => service.cargoId === cargo.id)?.quantity || 0}
+            onChange={(e) => handleServiceChange(cargo.id, Number(e.target.value))}
+            inputProps={{ min: 0 }}
+            sx={{ width: "30%" }}
+        />
+    </Card>
+))}
+
+          </Box>
+
+          {/* Tổng tiền thanh toán */}
+          <Divider sx={{ my: 2 }} />
+          <Typography variant="h5" fontWeight="bold">
+            {t("Total Payment")}: {formatCurrency(totalPayment)}
+          </Typography>
+        </Box>
+
         <Box
           width="40%"
           display="grid"
@@ -228,20 +313,6 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 }
                 label={t("CASH")}
               />
-              {/* <FormControlLabel
-                value="CARD"
-                control={
-                  <Radio
-                    sx={{
-                      color: "#00a0bd",
-                      "&.Mui-checked": {
-                        color: "#00a0bd",
-                      },
-                    }}
-                  />
-                }
-                label="CARD"
-              /> */}
             </RadioGroup>
           </FormControl>
 
@@ -294,107 +365,6 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               />
             </RadioGroup>
           </FormControl>
-
-          {/* name on card */}
-          {/* <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label="Name On Card *"
-            onBlur={handleBlur}
-            onChange={(e) => setFieldValue("nameOnCard", e.target.value)}
-            value={values.nameOnCard}
-            name="nameOnCard"
-            error={!!touched.nameOnCard && !!errors.nameOnCard}
-            helperText={touched.nameOnCard && errors.nameOnCard}
-            sx={{
-              display: cardPaymentSelect ? "initial" : "none",
-              gridColumn: "span 2",
-            }}
-          /> */}
-
-          {/* card number */}
-          {/* <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label="Card Number *"
-            onBlur={handleBlur}
-            onChange={(e) => setFieldValue("cardNumber", e.target.value)}
-            value={values.cardNumber}
-            name="cardNumber"
-            error={!!touched.cardNumber && !!errors.cardNumber}
-            helperText={touched.cardNumber && errors.cardNumber}
-            sx={{
-              display: cardPaymentSelect ? "initial" : "none",
-              gridColumn: "span 2",
-            }}
-          /> */}
-
-          {/* expired date */}
-          {/* <FormControl
-            fullWidth
-            sx={{
-              display: cardPaymentSelect ? "initial" : "none",
-              gridColumn: "span 2",
-            }}
-          >
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                format="MM/yy"
-                label="Expired Date"
-                views={["year", "month"]}
-                openTo="month"
-                minDate={new Date()}
-                maxDate={new Date(2050, 12, 41)}
-                value={parse(values.expiredDate, "MM/yy", new Date())}
-                onChange={(newDate) => {
-                  setFieldValue("expiredDate", format(newDate, "MM/yy"));
-                }}
-                slotProps={{
-                  textField: {
-                    InputProps: {
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <CalendarMonthIcon />
-                        </InputAdornment>
-                      ),
-                    },
-                    size: "small",
-                    color: "warning",
-                    error: !!touched.expiredDate && !!errors.expiredDate,
-                  },
-                }}
-              />
-            </LocalizationProvider>
-            {!!touched.expiredDate && !!errors.expiredDate && (
-              <FormHelperText error>{errors.expiredDate}</FormHelperText>
-            )}
-          </FormControl> */}
-
-          {/* cvv */}
-          {/* <TextField
-            color="warning"
-            size="small"
-            fullWidth
-            variant="outlined"
-            type="text"
-            label="CVV *"
-            onBlur={handleBlur}
-            onChange={(e) => setFieldValue("cvv", e.target.value)}
-            value={values.cvv}
-            name="cvv"
-            error={!!touched.cvv && !!errors.cvv}
-            helperText={touched.cvv && errors.cvv}
-            sx={{
-              display: cardPaymentSelect ? "initial" : "none",
-              gridColumn: "span 2",
-            }}
-          /> */}
         </Box>
       </Box>
     </>

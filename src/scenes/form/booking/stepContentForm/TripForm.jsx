@@ -244,6 +244,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             getOptionLabel={(option) => option.name}
             options={provinceQuery.data ?? []}
             loading={provinceClicked && provinceQuery.isLoading}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             sx={{
               gridColumn: "span 2",
             }}
@@ -291,6 +292,7 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             getOptionLabel={(option) => option.name}
             options={provinceQuery.data ?? []}
             loading={provinceClicked && provinceQuery.isLoading}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
             sx={{
               gridColumn: "span 2",
             }}
