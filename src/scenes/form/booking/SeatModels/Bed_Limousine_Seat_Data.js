@@ -1,44 +1,42 @@
-const Bed_Limousine_Seat_Data = {
-    DOWN_STAIR: {
-        "A1": { name: "A1", choose: false },
-        "A2": { name: "A2", choose: false },
-        "A3": { name: "A3", choose: false },
-        "A4": { name: "A4", choose: false },
-        "A5": { name: "A5", choose: false },
-        "A6": { name: "A6", choose: false },
-        "A7": { name: "A7", choose: false },
-        "A8": { name: "A8", choose: false },
-        "A9": { name: "A9", choose: false },
-        "A10": { name: "A10", choose: false },
-        "A11": { name: "A11", choose: false },
-        "A12": { name: "A12", choose: false },
-        "A13": { name: "A13", choose: false },
-        "A14": { name: "A14", choose: false },
-        "A15": { name: "A15", choose: false },
-        "A16": { name: "A16", choose: false },
-        "A17": { name: "A17", choose: false },
-        "A18": { name: "A18", choose: false },
-    },
-    UP_STAIR: {
-        "B1": { name: "B1", choose: false },
-        "B2": { name: "B2", choose: false },
-        "B3": { name: "B3", choose: false },
-        "B4": { name: "B4", choose: false },
-        "B5": { name: "B5", choose: false },
-        "B6": { name: "B6", choose: false },
-        "B7": { name: "B7", choose: false },
-        "B8": { name: "B8", choose: false },
-        "B9": { name: "B9", choose: false },
-        "B10": { name: "B10", choose: false },
-        "B11": { name: "B11", choose: false },
-        "B12": { name: "B12", choose: false },
-        "B13": { name: "B13", choose: false },
-        "B14": { name: "B14", choose: false },
-        "B15": { name: "B15", choose: false },
-        "B16": { name: "B16", choose: false },
-        "B17": { name: "B17", choose: false },
-        "B18": { name: "B18", choose: false },
-    }
-}
+// Hàm tạo dữ liệu chỗ ngồi dựa trên sức chứa
+const generateSeats = (capacity, stairType = "DOWN_STAIR") => {
+  const seats = {};
+  for (let i = 1; i <= capacity; i++) {
+    const seatNumber = stairType === "UP_STAIR" ? `B${i}` : `A${i}`;
+    seats[seatNumber] = { name: seatNumber, choose: false };
+  }
+  return seats;
+};
 
-export default Bed_Limousine_Seat_Data
+// Dữ liệu chỗ ngồi theo loại xe, đảm bảo không bị tràn ra ngoài giao diện
+const Bed_Limousine_Seat_Data = {
+  BED: (capacity) => {
+    // Chia đều ghế giữa hai tầng nếu có đủ số lượng ghế
+    const halfCapacity = Math.ceil(capacity / 2);
+    return {
+      DOWN_STAIR: generateSeats(halfCapacity, "DOWN_STAIR"),
+      UP_STAIR: generateSeats(capacity - halfCapacity, "UP_STAIR"),
+      capacity: capacity,
+    };
+  },
+  LIMOUSINE: (capacity) => {
+    // Với xe limousine, có thể thêm logic chia 2 tầng nếu cần
+    const halfCapacity = Math.ceil(capacity / 2);
+    return {
+      DOWN_STAIR: generateSeats(halfCapacity, "DOWN_STAIR"),
+      UP_STAIR: generateSeats(capacity - halfCapacity, "UP_STAIR"),
+      capacity: capacity,
+    };
+  },
+  CHAIR: (capacity) => {
+    // Với xe ghế ngồi, logic chia 2 tầng được thêm vào để phù hợp giao diện
+    const halfCapacity = Math.ceil(capacity / 2);
+    return {
+      DOWN_STAIR: generateSeats(halfCapacity, "DOWN_STAIR"),
+      UP_STAIR: generateSeats(capacity - halfCapacity, "UP_STAIR"),
+      capacity: capacity,
+    };
+  },
+};
+
+export default Bed_Limousine_Seat_Data;

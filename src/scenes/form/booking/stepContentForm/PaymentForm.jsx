@@ -258,11 +258,11 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 value={values.paymentStatus}
                 onChange={(e) => setFieldValue("paymentStatus", e.target.value)}
               >
-                <FormControlLabel
+                {/* <FormControlLabel
                   value="UNPAID"
                   control={<Radio />}
                   label={t("UNPAID")}
-                />
+                /> */}
                 <FormControlLabel
                   value="PAID"
                   control={<Radio />}

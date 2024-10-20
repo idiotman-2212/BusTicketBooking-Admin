@@ -318,17 +318,19 @@ const {t} = useTranslation();
   // Handle delete Coach
   const handleDeleteBooking = (bookingId) => {
     deleteMutation.mutate(bookingId, {
-      onSuccess: (data) => {
-        setOpenModal(!openModal);
-        queryClient.invalidateQueries({ queryKey: ["bookings", pagination] });
-        handleToast("success", data);
-      },
-      onError: (error) => {
-        console.log("Delete Booking ", error);
-        handleToast("error", error.response?.data.message);
-      },
+        onSuccess: (data) => {
+            setOpenModal(!openModal);
+            queryClient.invalidateQueries({ queryKey: ["bookings", pagination] });
+            handleToast("success", data); // Hiển thị toast thành công
+        },
+        onError: (error) => {
+            console.log("Delete Booking ", error);
+            // Hiển thị toast error từ thông điệp lỗi được trả về
+            handleToast("error", error.response?.data?.message || "Failed to delete booking.");
+        },
     });
-  };
+};
+
 
   //xử lý search
   const table = useReactTable({

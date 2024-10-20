@@ -29,7 +29,7 @@ const formatCurrency = (amount) => {
 const BookingForm = () => {
   const { bookingId } = useParams();
   const queryClient = useQueryClient();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const bookingQuery = useQuery({
     queryKey: ["bookings", bookingId],
@@ -70,140 +70,151 @@ const BookingForm = () => {
             handleChange,
             handleBlur,
             handleSubmit,
-          }) => (
-            <form onSubmit={handleSubmit}>
-              {/* booking summary */}
-              <Box
-                display="flex"
-                flexDirection="column"
-                gap="10px"
-                textAlign="center"
-              >
-                <Typography variant="h3" fontWeight="bold" mb="16px">
-                  {t("Summary Booking Info")}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>{t("Customer")}: </span>
-                  {`${values.custFirstName} ${values.custLastName}`}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>{t("Contact Phone")}: </span>
-                  {`${values.phone}`}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>{t("Pickup Address")}: </span>
-                  {`${values.pickUpAddress}`}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>{t("Route")}: </span>
-                  {`${values.trip.source.name} ${
-                    values.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
-                  } ${values.trip.destination.name}`}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>{t("Coach")}: </span>
-                  {`${values.trip.coach.name}, Type: ${values.trip.coach.coachType}`}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>
-                    {t("Departure DateTime")}:{" "}
-                  </span>{" "}
-                  {format(
-                    parse(
-                      values.trip.departureDateTime,
-                      "yyyy-MM-dd HH:mm",
-                      new Date()
-                    ),
-                    "HH:mm dd-MM-yyyy"
-                  )}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>{t("Total")}: </span>
-                  {`${formatCurrency(values.totalPayment)}`}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>{t("Seats")}: </span>
-                  {values.seatNumber}
-                </Typography>
-                <Typography component="span" variant="h5">
-                  <span style={{ fontWeight: "bold" }}>{t("Method")}: </span>
-                  {values.paymentMethod}
-                </Typography>
-                {values.paymentStatus === "CANCEL" && (
-                  <Typography component="span" variant="h5">
-                    <span style={{ fontWeight: "bold" }}>{t("Payment Status")}: </span>
-                    {values.paymentStatus}ED
-                  </Typography>
-                )}
-                
-              </Box>
-              
-              {/* payment status */}
-              {values.paymentStatus !== "CANCEL" && (
-                <FormControl
-                  sx={{
-                    gridColumn: "span 2",
-                  }}
+          }) => {
+            // Kiểm tra trạng thái không cho chỉnh sửa nếu paymentStatus là CANCEL hoặc REFUNDED
+            const isEditable =
+              values.paymentStatus !== "CANCEL" &&
+              values.paymentStatus !== "REFUNDED";
+
+            return (
+              <form onSubmit={handleSubmit}>
+                {/* booking summary */}
+                <Box
+                  display="flex"
+                  flexDirection="column"
+                  gap="10px"
+                  textAlign="center"
                 >
-                  <FormLabel color="warning" id="paymentStatus">
-                    {t("Payment Status")}
-                  </FormLabel>
-                  <RadioGroup
-                    row
-                    aria-labelledby="paymentStatus"
-                    name="row-radio-buttons-group"
-                    value={values.paymentStatus}
-                    onChange={(e) => {
-                      setFieldValue("paymentStatus", e.target.value);
+                  <Typography variant="h3" fontWeight="bold" mb="16px">
+                    {t("Summary Booking Info")}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Customer")}: </span>
+                    {`${values.custFirstName} ${values.custLastName}`}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Contact Phone")}: </span>
+                    {`${values.phone}`}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Pickup Address")}: </span>
+                    {`${values.pickUpAddress}`}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Route")}: </span>
+                    {`${values.trip.source.name} ${
+                      values.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
+                    } ${values.trip.destination.name}`}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Coach")}: </span>
+                    {`${values.trip.coach.name}, Type: ${values.trip.coach.coachType}`}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>
+                      {t("Departure DateTime")}:{" "}
+                    </span>{" "}
+                    {format(
+                      parse(
+                        values.trip.departureDateTime,
+                        "yyyy-MM-dd HH:mm",
+                        new Date()
+                      ),
+                      "HH:mm dd-MM-yyyy"
+                    )}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Total")}: </span>
+                    {`${formatCurrency(values.totalPayment)}`}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Seats")}: </span>
+                    {values.seatNumber}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Method")}: </span>
+                    {values.paymentMethod}
+                  </Typography>
+                  {values.paymentStatus === "CANCEL" && (
+                    <Typography component="span" variant="h5">
+                      <span style={{ fontWeight: "bold" }}>{t("Payment Status")}: </span>
+                      {values.paymentStatus}ED
+                    </Typography>
+                  )}
+                </Box>
+
+                {/* payment status */}
+                {isEditable && (
+                  <FormControl
+                    sx={{
+                      gridColumn: "span 2",
                     }}
                   >
-                    <FormControlLabel
-                      value="UNPAID"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "#00a0bd",
-                            "&.Mui-checked": {
+                    <FormLabel color="warning" id="paymentStatus">
+                      {t("Payment Status")}
+                    </FormLabel>
+                    <RadioGroup
+                      row
+                      aria-labelledby="paymentStatus"
+                      name="row-radio-buttons-group"
+                      value={values.paymentStatus}
+                      onChange={(e) => {
+                        setFieldValue("paymentStatus", e.target.value);
+                      }}
+                    >
+                      <FormControlLabel
+                        value="UNPAID"
+                        control={
+                          <Radio
+                            sx={{
                               color: "#00a0bd",
-                            },
-                          }}
-                        />
-                      }
-                      label={t("UNPAID")}
-                    />
-                    <FormControlLabel
-                      value="PAID"
-                      control={
-                        <Radio
-                          sx={{
-                            color: "#00a0bd",
-                            "&.Mui-checked": {
+                              "&.Mui-checked": {
+                                color: "#00a0bd",
+                              },
+                            }}
+                          />
+                        }
+                        label={t("UNPAID")}
+                      />
+                      <FormControlLabel
+                        value="PAID"
+                        control={
+                          <Radio
+                            sx={{
                               color: "#00a0bd",
-                            },
-                          }}
-                        />
-                      }
-                      label={t("PAID")}
-                    />
-                  </RadioGroup>
-                </FormControl>
-              )}
+                              "&.Mui-checked": {
+                                color: "#00a0bd",
+                              },
+                            }}
+                          />
+                        }
+                        label={t("PAID")}
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                )}
 
-              <Box mt="20px" display="flex" justifyContent="center">
-                <LoadingButton
-                  disabled={values.paymentStatus === "CANCEL"}
-                  color="secondary"
-                  type="submit"
-                  variant="contained"
-                  loadingPosition="start"
-                  loading={updateMutation.isLoading}
-                  startIcon={<SaveAsOutlinedIcon />}
-                >
-                  {t("SAVE")}
-                </LoadingButton>
-              </Box>
-            </form>
-          )}
+                <Box mt="20px" display="flex" justifyContent="center">
+                  <LoadingButton
+                    disabled={!isEditable}
+                    color="secondary"
+                    type="submit"
+                    variant="contained"
+                    loadingPosition="start"
+                    loading={updateMutation.isLoading}
+                    startIcon={<SaveAsOutlinedIcon />}
+                  >
+                    {t("SAVE")}
+                  </LoadingButton>
+                </Box>
+                {!isEditable && (
+                  <Typography mt="20px" textAlign="center" color="error">
+                    {t("You cannot edit this booking as it has been cancelled or refunded.")}
+                  </Typography>
+                )}
+              </form>
+            );
+          }}
         </Formik>
       )}
     </Box>

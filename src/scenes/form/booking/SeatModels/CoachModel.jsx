@@ -19,17 +19,31 @@ const getBookingPrice = (trip) => {
 
 const CoachModel = (props) => {
   const { field, setActiveStep, bookingData, setBookingData } = props;
-  const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
-    field;
-  const [seatData, setSeatData] = useState(Bed_Limousine_Seat_Data);
+  const { setFieldValue } = field;
+  
+  // Quản lý trạng thái ghế đã chọn và số ghế
   const [selectedSeats, setSelectedSeats] = useState(bookingData.seatNumber);
   const [numberOfSelectedSeats, setNumberOfSelectedSeats] = useState(
     bookingData.seatNumber.length
   );
-  const coachType = bookingData.trip.coach.coachType;
-  const price = getBookingPrice(bookingData.trip);
-  const {t} = useTranslation();
 
+  // Loại xe và sức chứa động
+  const coachType = bookingData.trip.coach.coachType;
+  const capacity = bookingData.trip.coach.capacity; // Sức chứa của xe
+
+  // Giá vé cuối cùng
+  const price = getBookingPrice(bookingData.trip);
+  const { t } = useTranslation();
+
+  // Lấy dữ liệu ghế ngồi động từ `Bed_Limousine_Seat_Data`
+  const seatData = useMemo(() => {
+    if (Bed_Limousine_Seat_Data[coachType]) {
+      return Bed_Limousine_Seat_Data[coachType](capacity); // Dữ liệu ghế ngồi động dựa trên sức chứa
+    }
+    return {};
+  }, [coachType, capacity]);
+
+  // Lấy thông tin ghế đã đặt
   const seatBookingQuery = useQuery({
     queryKey: ["bookings", bookingData.trip.id, bookingData.bookingDateTime],
     queryFn: () =>
@@ -47,15 +61,14 @@ const CoachModel = (props) => {
     });
     return orderedSeats;
   };
+
   const orderedSeats = handleSeatOrdered(seatBookingQuery?.data ?? []);
 
+  // Cập nhật trạng thái khi ghế được chọn hoặc bỏ chọn
   const handleSeatChoose = useCallback(
     (seatNumber, STAIR, isSelected, isOrdered) => {
-      // if chosen seat is ordered then do nothing
-      if (isOrdered) return;
-
-      // max seat select
-      if (isSelected && numberOfSelectedSeats === MAX_SEAT_SELECT) return;
+      if (isOrdered) return; // Nếu ghế đã đặt thì không thể chọn
+      if (isSelected && numberOfSelectedSeats === MAX_SEAT_SELECT) return; // Giới hạn số ghế
 
       let newSelectedSeats = [...selectedSeats];
 
@@ -71,7 +84,7 @@ const CoachModel = (props) => {
         setNumberOfSelectedSeats(numberOfSelectedSeats - 1);
       }
 
-      // mapping and update state
+      // Cập nhật trạng thái ghế trong seatData
       const newValues = {
         ...seatData,
         [STAIR]: {
@@ -82,11 +95,10 @@ const CoachModel = (props) => {
           },
         },
       };
-      setSeatData(newValues);
       setFieldValue("seatNumber", newSelectedSeats);
       setFieldValue("totalPayment", newSelectedSeats.length * price);
     },
-    [seatData]
+    [seatData, selectedSeats, numberOfSelectedSeats, price, setFieldValue]
   );
 
   const memoizedHandleSeatChoose = useMemo(
@@ -107,10 +119,9 @@ const CoachModel = (props) => {
       display="flex"
       justifyContent="space-evenly"
       alignItems="center"
-      overflow="auto"
       height="400px"
     >
-      {/* render seat tip */}
+      {/* Render trạng thái ghế */}
       <Box
         mt="30px"
         gap="35px"
@@ -153,7 +164,7 @@ const CoachModel = (props) => {
         </Box>
       </Box>
 
-      {/* Render seats */}
+      {/* Render ghế ngồi */}
       <Box
         display="flex"
         alignItems="center"
@@ -164,26 +175,23 @@ const CoachModel = (props) => {
           <Box
             key={index}
             display="grid"
-            // gap="4px"
-            gridTemplateColumns="repeat(3, minmax(0, 1fr))"
+            gridTemplateColumns="repeat(3, minmax(0, 1fr))" // Hiển thị 3 ghế trên mỗi hàng
           >
-            {Object.entries(seatData[stair]).map((values) => {
-              return (
-                <SeatModel
-                  key={values[0]}
-                  handleSeatChoose={memoizedHandleSeatChoose}
-                  seat={values[1]}
-                  selectedSeats={selectedSeats}
-                  orderedSeats={orderedSeats}
-                  coachType={coachType}
-                />
-              );
-            })}
+            {Object.entries(seatData[stair]).map(([seatNumber, seat]) => (
+              <SeatModel
+                key={seatNumber}
+                handleSeatChoose={memoizedHandleSeatChoose}
+                seat={seat}
+                selectedSeats={selectedSeats}
+                orderedSeats={orderedSeats}
+                coachType={coachType}
+              />
+            ))}
           </Box>
         ))}
       </Box>
 
-      {/* Render additional information */}
+      {/* Render thông tin bổ sung */}
       <Box
         gap="35px"
         display="flex"

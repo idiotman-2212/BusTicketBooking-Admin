@@ -6,14 +6,15 @@ import { useTranslation } from "react-i18next";
 
 const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const { bookingDateTime, trip } = bookingData;
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
+  // Hàm tính giá vé cuối cùng (có áp dụng mã giảm giá nếu có)
   const getBookingPriceString = (trip) => {
     let finalPrice = trip.price;
     if (!isNaN(trip?.discount?.amount)) {
       finalPrice -= trip.discount.amount;
     }
-    // nhớ format cho đẹp
+    // Định dạng tiền tệ
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
       currency: "VND",
@@ -22,7 +23,7 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
 
   return (
     <>
-      {/* Summary Trip Info */}
+      {/* Thông tin tóm tắt về chuyến đi */}
       <Box mt="10px" textAlign="center">
         <Typography component="span" variant="h5">
           <span style={{ fontWeight: "bold" }}>{t("Route")}: </span>
@@ -47,7 +48,7 @@ const SeatForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         </Typography>
       </Box>
 
-      {/* Choose seat */}
+      {/* Chọn ghế */}
       <Box mt="30px">
         <CoachModel
           field={field}

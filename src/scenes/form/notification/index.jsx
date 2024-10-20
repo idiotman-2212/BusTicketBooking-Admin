@@ -19,13 +19,16 @@ import {
 import { LoadingButton } from "@mui/lab";
 import SaveAsOutlinedIcon from "@mui/icons-material/SaveAsOutlined";
 import { Formik } from "formik";
+import Header from "../../../components/Header";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import * as notificationApi from "../../../scenes/notification/notificationQueries";
 import { getAllUsers } from "../../user/userQueries";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const NotificationForm = () => {
+  const {t} = useTranslation();
   const { notificationId } = useParams();
   const [users, setUsers] = useState([]);
   const [initialValues, setInitialValues] = useState({
@@ -108,9 +111,10 @@ const NotificationForm = () => {
 
   return (
     <Box m="20px">
-      <Typography variant="h4" mb={2}>
-        {notificationId ? "Update Notification" : "Create Notification"}
-      </Typography>
+      <Header
+        title={notificationId ? t("EDIT NOTIFICATION") : t("CREATE NOTIFICATION")}
+        subTitle={notificationId ? t("Edit notification") : t("Create notification")}
+      />
 
       <Formik
           initialValues={initialValues}
