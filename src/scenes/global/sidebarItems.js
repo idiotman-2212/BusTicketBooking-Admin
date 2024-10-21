@@ -9,6 +9,8 @@ import AccessibleIcon from '@mui/icons-material/Accessible';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
+import EventNoteOutlinedIcon from "@mui/icons-material/EventNoteOutlined";
+
 import { useTranslation } from "react-i18next";
 
 export const sidebarItems = () => {
@@ -64,6 +66,11 @@ export const sidebarItems = () => {
             title: t('Reviews'),
             to: '/reviews',
             icon: RateReviewOutlinedIcon
+        },
+        {
+            title: t('Trip Logs'),
+            to: '/tripLogs',
+            icon: EventNoteOutlinedIcon
         },
         {
             title: t('Report'),
