@@ -2,11 +2,10 @@ import AddIcon from "@mui/icons-material/Add";
 import CheckIcon from "@mui/icons-material/Check";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
 import CommuteOutlinedIcon from "@mui/icons-material/CommuteOutlined";
 import PersonIcon from "@mui/icons-material/Person";
+import SearchIcon from "@mui/icons-material/Search";
 
 import {
   Box,
@@ -16,11 +15,16 @@ import {
   Modal,
   Typography,
   useTheme,
-  Backdrop,
-  Fade,
+  Stack,
+  TextField,
+  Skeleton,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getCoreRowModel, getFilteredRowModel, useReactTable } from "@tanstack/react-table";
+import {
+  getCoreRowModel,
+  getFilteredRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomDataTable from "../../components/CustomDataTable";
@@ -29,6 +33,7 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import { handleToast } from "../../utils/helpers";
 import { useQueryString } from "../../utils/useQueryString";
+import { useTranslation } from "react-i18next";
 
 import * as userApi from "../user/userQueries";
 import * as tripApi from "../trip/tripQueries";
@@ -39,26 +44,41 @@ const TripLog = () => {
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState("");
 
   const [openTripDetailModal, setOpenTripDetailModal] = useState(false);
-  const [tripDetails, setTripDetails] = useState(null);
+  const [tripId, setTripId] = useState(null);
 
   const [openUserDetailModal, setOpenUserDetailModal] = useState(false);
-  const [userDetails, setUserDetails] = useState(null);
+  const [username, setUsername] = useState(null);
 
   const [filtering, setFiltering] = useState("");
+
+  // Fetch Trip Details
+  const tripQuery = useQuery({
+    queryKey: ["trip", tripId],
+    queryFn: () => tripApi.getTrip(tripId),
+    enabled: !!tripId,
+  });
+
+  // Fetch User Details
+  const userQuery = useQuery({
+    queryKey: ["user", username],
+    queryFn: () => userApi.getUser(username),
+    enabled: !!username,
+  });
 
   const columns = useMemo(
     () => [
       {
-        header: "Trip ID",
+        header: t("Trip ID"),
         accessorKey: "trip.id",
-        footer: "Trip ID",
+        footer: t("Trip ID"),
         width: 100,
-        maxWidth: 150,
+        maxWidth: 100,
         isEllipsis: true,
         cell: (info) => (
           <Box display="flex" alignItems="center">
@@ -74,36 +94,36 @@ const TripLog = () => {
         ),
       },
       {
-        header: "Log Type",
+        header: t("Log Type"),
         accessorKey: "logType",
-        footer: "Log Type",
+        footer: t("Log Type"),
         width: 150,
         maxWidth: 200,
         isEllipsis: true,
       },
       {
-        header: "Log Time",
+        header: t("Log Time"),
         accessorKey: "logTime",
-        footer: "Log Time",
+        footer: t("Log Time"),
         width: 200,
         maxWidth: 250,
         align: "center",
         cell: (info) => new Date(info.getValue()).toLocaleString(),
       },
       {
-        header: "Description",
+        header: t("Description"),
         accessorKey: "description",
-        footer: "Description",
+        footer: t("Description"),
         width: 200,
         maxWidth: 300,
         isEllipsis: true,
       },
       {
-        header: "Created By",
-        accessorKey: "createdBy.username",  // Sử dụng createdBy.username để lấy tên người dùng
-        footer: "Created By",
-        width: 200,
-        maxWidth: 250,
+        header: t("Created By"),
+        accessorKey: "createdBy.username",
+        footer: t("Created By"),
+        width: 100,
+        maxWidth: 100,
         cell: (info) => (
           <Box display="flex" alignItems="center">
             <Typography>{info.getValue()}</Typography>
@@ -118,21 +138,25 @@ const TripLog = () => {
         ),
       },
       {
-        header: "Action",
+        header: t("Action"),
         accessorKey: "action",
-        footer: "Action",
+        footer: t("Action"),
         width: 120,
         maxWidth: 250,
         align: "center",
         cell: (info) => (
           <Box>
-            <CustomToolTip title="Edit" placement="top">
-              <IconButton onClick={() => handleOpenUpdateForm(info.row.original.id)}>
+            <CustomToolTip title={t("Edit")} placement="top">
+              <IconButton
+                onClick={() => handleOpenUpdateForm(info.row.original.id)}
+              >
                 <EditOutlinedIcon />
               </IconButton>
             </CustomToolTip>
-            <CustomToolTip title="Delete" placement="top">
-              <IconButton onClick={() => handleOpenDeleteForm(info.row.original.id)}>
+            <CustomToolTip title={t("Delete")} placement="top">
+              <IconButton
+                onClick={() => handleOpenDeleteForm(info.row.original.id)}
+              >
                 <DeleteOutlineOutlinedIcon />
               </IconButton>
             </CustomToolTip>
@@ -140,39 +164,27 @@ const TripLog = () => {
         ),
       },
     ],
-    []
+    [t]
   );
 
-  const handleOpenTripDetailModal = async (tripId) => {
-    try {
-      const data = await tripApi.getTrip(tripId);
-      setTripDetails(data);
-      setOpenTripDetailModal(true);
-    } catch (error) {
-      console.error("Error fetching trip details:", error);
-      handleToast("error", "Không thể tải thông tin chuyến đi.");
-    }
+  const handleOpenTripDetailModal = (tripId) => {
+    setTripId(tripId);
+    setOpenTripDetailModal(true);
   };
 
   const handleCloseTripDetailModal = () => {
     setOpenTripDetailModal(false);
-    setTripDetails(null);
+    setTripId(null);
   };
 
-  const handleOpenUserDetailModal = async (username) => {
-    try {
-      const data = await userApi.getUser(username);
-      setUserDetails(data);
-      setOpenUserDetailModal(true);
-    } catch (error) {
-      console.error("Error fetching user details:", error);
-      handleToast("error", "Không thể tải thông tin người dùng.");
-    }
+  const handleOpenUserDetailModal = (username) => {
+    setUsername(username);
+    setOpenUserDetailModal(true);
   };
 
   const handleCloseUserDetailModal = () => {
     setOpenUserDetailModal(false);
-    setUserDetails(null);
+    setUsername(null);
   };
 
   const handleOpenAddNewForm = () => {
@@ -198,16 +210,16 @@ const TripLog = () => {
     onSuccess: () => {
       setOpenDeleteModal(false);
       queryClient.invalidateQueries({ queryKey: ["tripLogs"] });
-      handleToast("success", "Xóa nhật ký hành trình thành công");
+      handleToast("success", t("Delete trip log successfully"));
     },
     onError: (error) => {
-      handleToast("error", error.response?.data.message || "Xóa thất bại");
+      handleToast("error", error.response?.data.message || t("Delete failed"));
     },
   });
 
   const handleDeleteTripLog = () => {
     if (!selectedRow) {
-      handleToast("error", "Không có nhật ký nào được chọn để xóa");
+      handleToast("error", t("No trip log selected for deletion"));
       return;
     }
     deleteMutation.mutate(selectedRow);
@@ -222,14 +234,17 @@ const TripLog = () => {
     pageSize: limit,
   });
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["tripLogs", pagination],
     queryFn: async () => {
       setSearchParams({
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
       });
-      return tripLogApi.getPageOfTripLogs(pagination.pageIndex, pagination.pageSize);
+      return tripLogApi.getPageOfTripLogs(
+        pagination.pageIndex,
+        pagination.pageSize
+      );
     },
     keepPreviousData: true,
   });
@@ -251,9 +266,11 @@ const TripLog = () => {
 
   return (
     <Box m="20px">
+      {/* Header */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="TRIP LOGS" subTitle="Quản lý nhật ký hành trình" />
+        <Header title={t("TRIP LOGS")} subTitle={t("Trip log management")} />
 
+        {/* Search Box */}
         <Box
           width="350px"
           height="40px"
@@ -263,7 +280,7 @@ const TripLog = () => {
         >
           <InputBase
             sx={{ ml: 2, flex: 1 }}
-            placeholder="Tìm kiếm"
+            placeholder={t("Search")}
             value={filtering}
             onChange={(e) => setFiltering(e.target.value)}
           />
@@ -272,6 +289,7 @@ const TripLog = () => {
           </IconButton>
         </Box>
 
+        {/* Add New Button */}
         <Button
           onClick={handleOpenAddNewForm}
           variant="contained"
@@ -279,180 +297,321 @@ const TripLog = () => {
           startIcon={<AddIcon />}
           size="large"
         >
-          Thêm mới
+          {t("Add new")}
         </Button>
       </Box>
 
-      {isLoading ? (
-        <Typography>Đang tải dữ liệu...</Typography>
-      ) : isError ? (
-        <Typography color="error">Có lỗi xảy ra khi tải dữ liệu</Typography>
-      ) : (
-        <CustomDataTable
-          table={table}
-          colors={colors}
-          totalElements={data?.totalElements}
-        />
-      )}
+      {/* Data Table */}
+      <CustomDataTable
+        table={table}
+        colors={colors}
+        totalElements={data?.totalElements}
+      />
 
       {/* Modal chi tiết Trip */}
       <Modal
+        sx={{
+          "& .MuiBox-root": {
+            bgcolor:
+              theme.palette.mode === "dark" ? colors.primary[400] : "#fff",
+          },
+        }}
         open={openTripDetailModal}
         onClose={handleCloseTripDetailModal}
-        aria-labelledby="trip-modal-title"
-        aria-describedby="trip-modal-description"
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
       >
-        <Fade in={openTripDetailModal}>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: 400,
-              bgcolor: "background.paper",
-              borderRadius: "10px",
-              boxShadow: 24,
-              p: 4,
-            }}
-          >
-            <Typography id="trip-modal-title" variant="h4" textAlign="center" gutterBottom>
-              Chi tiết Trip
-            </Typography>
-            {tripDetails ? (
-              <>
-                <Typography>
-                  <strong>Điểm nguồn:</strong> {tripDetails.source?.name || "N/A"}
-                </Typography>
-                <Typography>
-                  <strong>Điểm đích:</strong> {tripDetails.destination?.name || "N/A"}
-                </Typography>
-                <Typography>
-                  <strong>Thời gian khởi hành:</strong> {new Date(tripDetails.departureDateTime).toLocaleString()}
-                </Typography>
-              </>
-            ) : (
-              <Typography>Không có dữ liệu</Typography>
-            )}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            minWidth: 400,
+            borderRadius: "10px",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Box textAlign="center" marginBottom="30px">
+            <Typography variant="h4">{t("TRIP DETAIL")}</Typography>
           </Box>
-        </Fade>
+          {tripQuery.isLoading ? (
+            <Stack spacing={1}>
+              <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+              <Skeleton variant="rectangular" width={210} height={60} />
+            </Stack>
+          ) : (
+            <Box
+              display="grid"
+              gap="30px"
+              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+            >
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("From")}
+                value={tripQuery.data?.source?.name || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("To")}
+                value={tripQuery.data?.destination?.name || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Departure DateTime")}
+                value={
+                  tripQuery.data
+                    ? new Date(
+                        tripQuery.data.departureDateTime
+                      ).toLocaleString()
+                    : "N/A"
+                }
+                sx={{ gridColumn: "span 4" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Duration")}
+                value={tripQuery.data?.duration || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Price")}
+                value={tripQuery.data?.price || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Coach Type")}
+                value={tripQuery.data?.coach?.coachType || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Email Address")}
+                value={tripQuery.data?.driver?.email || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Driver")}
+                value={
+                  tripQuery.data
+                    ? `${tripQuery.data.driver?.firstName} ${tripQuery.data.driver?.lastName}`
+                    : "N/A"
+                }
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Driver Phone")}
+                value={tripQuery.data?.driver?.phone || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+            </Box>
+          )}
+        </Box>
       </Modal>
 
       {/* Modal chi tiết User */}
       <Modal
+        sx={{
+          "& .MuiBox-root": {
+            bgcolor:
+              theme.palette.mode === "dark" ? colors.primary[400] : "#fff",
+          },
+        }}
         open={openUserDetailModal}
         onClose={handleCloseUserDetailModal}
-        aria-labelledby="user-modal-title"
-        aria-describedby="user-modal-description"
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
       >
-        <Fade in={openUserDetailModal}>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: 400,
-              bgcolor: "background.paper",
-              borderRadius: "10px",
-              boxShadow: 24,
-              p: 4,
-            }}
-          >
-            <Typography id="user-modal-title" variant="h4" textAlign="center" gutterBottom>
-              Chi tiết Người Dùng
-            </Typography>
-            {userDetails ? (
-              <>
-                <Typography>
-                  <strong>Username:</strong> {userDetails.username}
-                </Typography>
-                <Typography>
-                  <strong>First Name:</strong> {userDetails.firstName}
-                </Typography>
-                <Typography>
-                  <strong>Last Name:</strong> {userDetails.lastName}
-                </Typography>
-              </>
-            ) : (
-              <Typography>Không có dữ liệu</Typography>
-            )}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            minWidth: 400,
+            borderRadius: "10px",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Box textAlign="center" marginBottom="30px">
+            <Typography variant="h4">{t("USER DETAIL")}</Typography>
           </Box>
-        </Fade>
+          {userQuery.isLoading ? (
+            <Stack spacing={1}>
+              <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
+              <Skeleton variant="rectangular" width={210} height={60} />
+            </Stack>
+          ) : (
+            <Box
+              display="grid"
+              gap="30px"
+              gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+            >
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Full Name")}
+                value={
+                  `${userQuery.data?.firstName} ${userQuery.data?.lastName}` ||
+                  "N/A"
+                }
+                sx={{ gridColumn: "span 4" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label="Email"
+                value={userQuery.data?.email || "N/A"}
+                sx={{ gridColumn: "span 4" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Phone")}
+                value={userQuery.data?.phone || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Email Address")}
+                value={userQuery.data?.email || "N/A"}
+                sx={{ gridColumn: "span 2" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Address")}
+                value={userQuery.data?.address || "N/A"}
+                sx={{ gridColumn: "span 4" }}
+              />
+              <TextField
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Date of Birth")}
+                value={
+                  userQuery.data?.dob
+                    ? new Date(userQuery.data?.dob).toLocaleDateString()
+                    : "N/A"
+                }
+                sx={{ gridColumn: "span 4" }}
+              />
+            </Box>
+          )}
+        </Box>
       </Modal>
 
       {/* Modal xóa nhật ký hành trình */}
       <Modal
+        sx={{
+          "& .MuiBox-root": {
+            bgcolor:
+              theme.palette.mode === "dark" ? colors.blueAccent[700] : "#fff",
+          },
+        }}
         open={openDeleteModal}
         onClose={handleCloseDeleteModal}
         aria-labelledby="delete-modal-title"
         aria-describedby="delete-modal-description"
-        closeAfterTransition
-        BackdropComponent={Backdrop}
-        BackdropProps={{
-          timeout: 500,
-        }}
       >
-        <Fade in={openDeleteModal}>
-          <Box
-            sx={{
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              width: 400,
-              borderRadius: "10px",
-              boxShadow: 24,
-              p: 4,
-              bgcolor: "background.paper",
-            }}
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 450,
+            borderRadius: "10px",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography
+            id="delete-modal-title"
+            variant="h5"
+            textAlign="center"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
           >
-            <Typography
-              id="delete-modal-title"
-              variant="h5"
-              textAlign="center"
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              gutterBottom
+            <WarningRoundedIcon
+              sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "8px" }}
+            />
+            {t("Delete Trip Log")}
+          </Typography>
+          <Typography
+            id="delete-modal-description"
+            variant="body1"
+            textAlign="center"
+            sx={{ mt: 2 }}
+          >
+            {t("Are you sure you want to delete trip log with ID")}{" "}
+            <strong>{selectedRow}</strong>?
+          </Typography>
+          <Box mt={3} display="flex" justifyContent="space-around">
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<CheckIcon />}
+              onClick={handleDeleteTripLog}
+              sx={{ borderRadius: "8px" }}
             >
-              <WarningRoundedIcon
-                sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "8px" }}
-              />
-              Xóa nhật ký hành trình
-            </Typography>
-            <Typography id="delete-modal-description" sx={{ mt: 2 }} textAlign="center">
-              Bạn có chắc chắn muốn xóa nhật ký hành trình với ID: <strong>{selectedRow}</strong>?
-            </Typography>
-            <Box sx={{ mt: 3 }} display="flex" justifyContent="space-around">
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<CheckIcon />}
-                onClick={handleDeleteTripLog}
-              >
-                Xác nhận
-              </Button>
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleCloseDeleteModal}
-              >
-                Hủy
-              </Button>
-            </Box>
+              {t("Confirm")}
+            </Button>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<DeleteOutlineOutlinedIcon />}
+              onClick={handleCloseDeleteModal}
+              sx={{ borderRadius: "8px" }}
+            >
+              {t("Cancel")}
+            </Button>
           </Box>
-        </Fade>
+        </Box>
       </Modal>
     </Box>
   );

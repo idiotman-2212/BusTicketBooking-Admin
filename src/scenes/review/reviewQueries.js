@@ -30,9 +30,19 @@ const createNewReviews = async (newReviews) => {
     return resp.data
 }
 
+const getReviewStatsByTripId = async (tripId) => {
+    const resp = await http.get(`/reviews/stats/trip/${tripId}`);
+    return resp.data;
+};
+
+const getDriverCoachTripStats = async () => {
+    const resp = await http.get("/reviews/stats/driver-coach-trip");
+    return resp.data;
+};
+
 
 export {
     createNewReviews, getAll,
-    getPageOfReviews, getReviewById, getReviewByBookingId
+    getPageOfReviews, getReviewById, getReviewByBookingId,getReviewStatsByTripId,getDriverCoachTripStats
 };
 

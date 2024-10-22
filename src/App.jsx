@@ -41,6 +41,7 @@ import Cargo from "./scenes/cargo";
 import CargoForm from "./scenes/form/cargo";
 import TripLog from "./scenes/TripLog";
 import TripLogForm from "./scenes/form/tripLog";
+import ReviewReport from "./scenes/form/review";
 
 //kiểm tra quyền người dùng
 const hasReadAccessRoleToScreen = (permissions, pathname) => {
@@ -169,7 +170,7 @@ const App = () => {
                   </Route>
                   <Route path="/reviews">
                     <Route index element={<Review />} /> 
-                    <Route path=":reviewId" element={<ReviewForm />} />
+                    <Route path="report" element={<ReviewReport />} />
                   </Route>
                   <Route path="/cargos">
                     <Route index element={<Cargo />} />

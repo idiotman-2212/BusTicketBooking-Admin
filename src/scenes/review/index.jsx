@@ -11,6 +11,7 @@ import {
   TextField,
   Typography,
   useTheme,
+  Button,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -24,11 +25,13 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import * as reviewApi from "../review/reviewQueries";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 const Review = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [selectedRow, setSelectedRow] = useState("");
   const [filtering, setFiltering] = useState("");
@@ -209,6 +212,14 @@ const Review = () => {
             <SearchIcon />
           </IconButton>
         </Box>
+
+        {/* <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => navigate("report")}
+        >
+          Xem báo cáo
+        </Button> */}
       </Box>
 
       {/* Review Table */}
