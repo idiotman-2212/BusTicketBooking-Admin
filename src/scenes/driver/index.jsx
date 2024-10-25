@@ -56,9 +56,10 @@ const Driver = () => {
         header: t("First Name"),
         accessorKey: "firstName",
         footer: "First Name",
-        width: 150,
-        maxWidth: 200,
+        width: 100,
+        maxWidth: 100,
         isEllipsis: true,
+        align: "center",
       },
       {
         header: t("Last Name"),
@@ -67,14 +68,14 @@ const Driver = () => {
         width: 100,
         maxWidth: 150,
         isEllipsis: true,
-        align: "left",
+        align: "center",
       },
       {
         header: t("License Number"),
         accessorKey: "licenseNumber",
         footer: "License Number",
-        width: 180,
-        maxWidth: 200,
+        width: 150,
+        maxWidth: 150,
         isEllipsis: true,
         align: "center",
       },
@@ -83,7 +84,7 @@ const Driver = () => {
         accessorKey: "phone",
         footer: "Phone",
         width: 100,
-        maxWidth: 250,
+        maxWidth: 200,
         isEllipsis: true,
         align: "center",
       },
@@ -92,7 +93,7 @@ const Driver = () => {
         accessorKey: "gender",
         footer: "Gender",
         width: 60,
-        maxWidth: 150,
+        maxWidth: 100,
 
         align: "center",
         cell: (info) =>
@@ -115,7 +116,7 @@ const Driver = () => {
         accessorKey: "quit",
         footer: "Working",
         width: 60,
-        maxWidth: 150,
+        maxWidth: 100,
         align: "center",
         cell: (info) =>
           !info.getValue() ? (

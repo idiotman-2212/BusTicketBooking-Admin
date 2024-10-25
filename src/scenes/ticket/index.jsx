@@ -72,7 +72,14 @@ const {t} = useTranslation();
     enabled: selectedRow !== "",
   });
 
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+  
+    const { address, ward, district, province } = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${district ? ", " + district : ""}${province?.name ? ", " + province.name : ""}`;
+  };
 
+  
   // const userQuery = useQuery({
   //   queryKey: ["users", selectedUser],
   //   queryFn: () => userApi.getUser(selectedUser),
@@ -424,7 +431,7 @@ const {t} = useTranslation();
             <Typography variant="h4">{t("CUSTOMER DETAIL")}</Typography>
             <Typography mt="5px" variant="h5" fontStyle="italic">
               {bookingQuery.data?.user !== null
-                ? `Buy with Account (${bookingQuery.data?.user?.username})`
+                ? `Buy with Account (${bookingQuery.data?.username})`
                 : "Buy without Account"}
             </Typography>
           </Box>
@@ -488,9 +495,22 @@ const {t} = useTranslation();
                 fullWidth
                 variant="outlined"
                 type="text"
-                label={t("Pickup Address")}
-                name="address"
-                value={bookingQuery?.data?.pickUpAddress}
+                label={t("Pickup Location")}
+                name="pickUpLocation"
+                value={formatLocation(bookingQuery?.data?.trip.pickUpLocation)}
+                sx={{
+                  gridColumn: "span 4",
+                }}
+              />
+              <TextField
+                color="warning"
+                size="small"
+                fullWidth
+                variant="outlined"
+                type="text"
+                label={t("Dropoff Location")}
+                name="dropOffLocation"
+                value={formatLocation(bookingQuery?.data?.trip.dropOffLocation)}
                 sx={{
                   gridColumn: "span 4",
                 }}
@@ -549,8 +569,8 @@ const {t} = useTranslation();
                 fullWidth
                 variant="outlined"
                 type="text"
-                label={t("From")}
-                name="from"
+                label={t("Source")}
+                name="source"
                 value={bookingQuery?.data?.trip.source.name}
                 sx={{
                   gridColumn: "span 2",
@@ -562,8 +582,8 @@ const {t} = useTranslation();
                 fullWidth
                 variant="outlined"
                 type="text"
-                label={t("To")}
-                name="to"
+                label={t("Destination")}
+                name="destination"
                 value={bookingQuery?.data?.trip.destination.name}
                 sx={{
                   gridColumn: "span 2",

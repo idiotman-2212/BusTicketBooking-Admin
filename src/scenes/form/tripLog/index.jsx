@@ -124,9 +124,9 @@ const TripLogForm = () => {
   return (
     <Box m="20px">
       <Header
-        title={tripLogId ? "EDIT TRIP LOG" : "CREATE TRIP LOG"}
+        title={tripLogId ? t("EDIT TRIP LOG") : t("CREATE TRIP LOG")}
         subTitle={
-          tripLogId ? "Edit an existing trip log" : "Create a new trip log"
+          tripLogId ? t("Edit trip log") : t("Create a new trip log")
         }
       />
 
@@ -150,7 +150,7 @@ const TripLogForm = () => {
             <Box display="grid" gap="30px" gridTemplateColumns="repeat(4, 1fr)">
               {/* Select Trip (TripId) */}
               <FormControl sx={{ gridColumn: "span 2" }}>
-                <InputLabel>Trip</InputLabel>
+                <InputLabel>{t("Trip")}</InputLabel>
                 <Select
                   name="tripId"
                   value={values.tripId}
@@ -173,7 +173,7 @@ const TripLogForm = () => {
 
               {/* Select log type */}
               <FormControl sx={{ gridColumn: "span 2" }}>
-                <InputLabel>Log Type</InputLabel>
+                <InputLabel>{t("Log Type")}</InputLabel>
                 <Select
                   name="logType"
                   value={values.logType}
@@ -181,11 +181,11 @@ const TripLogForm = () => {
                   onBlur={handleBlur}
                   error={touched.logType && Boolean(errors.logType)}
                 >
-                  <MenuItem value="INCIDENT">Incident</MenuItem>
-                  <MenuItem value="BREAKDOWN">Breakdown</MenuItem>
-                  <MenuItem value="MAINTENANCE">Maintenance</MenuItem>
-                  <MenuItem value="COMPLETED">Completed</MenuItem>
-                  <MenuItem value="OTHER">Other</MenuItem>
+                  <MenuItem value="INCIDENT">{t("Incident")}</MenuItem>
+                  <MenuItem value="BREAKDOWN">{t("Breakdown")}</MenuItem>
+                  <MenuItem value="MAINTENANCE">{t("Maintenance")}</MenuItem>
+                  <MenuItem value="COMPLETED">{t("Completed")}</MenuItem>
+                  <MenuItem value="OTHER">{t("Other")}</MenuItem>
                 </Select>
                 {!!errors.logType && (
                   <FormHelperText error>{errors.logType}</FormHelperText>
@@ -196,7 +196,7 @@ const TripLogForm = () => {
               <FormControl sx={{ gridColumn: "span 2" }}>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                   <DateTimePicker
-                    label="Log Time"
+                    label={t("Log Time")}
                     value={parse(
                       values.logTime,
                       "yyyy-MM-dd HH:mm:ss",
@@ -229,7 +229,7 @@ const TripLogForm = () => {
 
               {/* Location */}
               <FormControl sx={{ gridColumn: "span 2" }}>
-                <InputLabel>Location</InputLabel>
+                <InputLabel>{t("Location")}</InputLabel>
                 <OutlinedInput
                   name="location"
                   value={values.location}
@@ -240,7 +240,7 @@ const TripLogForm = () => {
 
               {/* Description */}
               <FormControl sx={{ gridColumn: "span 4" }}>
-                <InputLabel>Description</InputLabel>
+                <InputLabel>{t("Description")}</InputLabel>
                 <OutlinedInput
                   name="description"
                   multiline
@@ -265,7 +265,7 @@ const TripLogForm = () => {
                 loading={isSubmitting}
                 startIcon={<SaveAsOutlinedIcon />}
               >
-                {tripLogId ? "SAVE" : "CREATE"}
+                {tripLogId ? t("SAVE") : t("CREATE")}
               </LoadingButton>
             </Box>
           </form>

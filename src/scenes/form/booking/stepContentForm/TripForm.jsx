@@ -131,7 +131,6 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     return resp;
   };
 
-  
   useEffect(() => {
     const fetchOrderedSeats = async () => {
       if (findTripQuery.data && values.bookingDateTime) {
@@ -146,6 +145,16 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
 
     fetchOrderedSeats(); // Gọi hàm fetchOrderedSeats khi component được render
   }, [findTripQuery.data, values.bookingDateTime]);
+
+
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district} = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${
+      district ? ", " + district : ""
+    }`;
+  };
 
   return (
     <>
@@ -168,55 +177,6 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           {t("Find")}
         </LoadingButton>
       </Box>
-      {/* BOOKING TYPE */}
-      {/* <Box display="flex">
-        <FormControl
-          sx={{
-            marginLeft: "auto",
-          }}
-        >
-          <RadioGroup
-            row
-            // aria-labelledby="bookingType"
-            name="row-radio-buttons-group"
-            value={values.bookingType}
-            onChange={(e) => {
-              setFieldValue("bookingType", e.currentTarget.value);
-            }}
-          >
-            <FormControlLabel
-              value="ONEWAY"
-              label="One way"
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    color: "#00a0bd",
-                    "&.Mui-checked": {
-                      color: "#00a0bd",
-                    },
-                  }}
-                />
-              }
-            />
-            <FormControlLabel
-              value="ROUNDTRIP"
-              label="Round trip"
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    color: "#00a0bd",
-                    "&.Mui-checked": {
-                      color: "#00a0bd",
-                    },
-                  }}
-                />
-              }
-            />
-          </RadioGroup>
-        </FormControl>
-      </Box> */}
       <Box
         mt="20px"
         display="grid"
@@ -463,8 +423,8 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                           )}
                           ]
                         </span>{" "}
-                        {trip.source.name} {`\u21D2`}
-                        {trip.destination.name}
+                        {formatLocation(trip.pickUpLocation)} {`\u21D2`}
+                        {formatLocation(trip.dropOffLocation)}
                       </Typography>
                     }
                     secondary={

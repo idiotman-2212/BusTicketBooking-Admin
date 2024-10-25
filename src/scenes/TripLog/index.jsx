@@ -6,6 +6,7 @@ import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
 import CommuteOutlinedIcon from "@mui/icons-material/CommuteOutlined";
 import PersonIcon from "@mui/icons-material/Person";
 import SearchIcon from "@mui/icons-material/Search";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import {
   Box,
@@ -80,6 +81,7 @@ const TripLog = () => {
         width: 100,
         maxWidth: 100,
         isEllipsis: true,
+        align: "center",
         cell: (info) => (
           <Box display="flex" alignItems="center">
             <Typography>{info.getValue()}</Typography>
@@ -100,13 +102,14 @@ const TripLog = () => {
         width: 150,
         maxWidth: 200,
         isEllipsis: true,
+        align: "center",
       },
       {
         header: t("Log Time"),
         accessorKey: "logTime",
         footer: t("Log Time"),
         width: 200,
-        maxWidth: 250,
+        maxWidth: 200,
         align: "center",
         cell: (info) => new Date(info.getValue()).toLocaleString(),
       },
@@ -117,6 +120,7 @@ const TripLog = () => {
         width: 200,
         maxWidth: 300,
         isEllipsis: true,
+        align: "center",
       },
       {
         header: t("Created By"),
@@ -124,6 +128,7 @@ const TripLog = () => {
         footer: t("Created By"),
         width: 100,
         maxWidth: 100,
+        align: "center",
         cell: (info) => (
           <Box display="flex" alignItems="center">
             <Typography>{info.getValue()}</Typography>
@@ -350,7 +355,7 @@ const TripLog = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label={t("From")}
+                label={t("Source")}
                 value={tripQuery.data?.source?.name || "N/A"}
                 sx={{ gridColumn: "span 2" }}
               />
@@ -359,7 +364,7 @@ const TripLog = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label={t("To")}
+                label={t("Destination")}
                 value={tripQuery.data?.destination?.name || "N/A"}
                 sx={{ gridColumn: "span 2" }}
               />
@@ -383,7 +388,7 @@ const TripLog = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label={t("Duration")}
+                label={t("Duration (hour)")}
                 value={tripQuery.data?.duration || "N/A"}
                 sx={{ gridColumn: "span 2" }}
               />
@@ -410,7 +415,7 @@ const TripLog = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label={t("Email Address")}
+                label={t("Email")}
                 value={tripQuery.data?.driver?.email || "N/A"}
                 sx={{ gridColumn: "span 2" }}
               />
@@ -513,7 +518,7 @@ const TripLog = () => {
                 fullWidth
                 variant="outlined"
                 type="text"
-                label={t("Email Address")}
+                label={t("Email")}
                 value={userQuery.data?.email || "N/A"}
                 sx={{ gridColumn: "span 2" }}
               />
@@ -563,7 +568,7 @@ const TripLog = () => {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: 450,
+            width: 400,
             borderRadius: "10px",
             boxShadow: 24,
             p: 4,
@@ -571,7 +576,7 @@ const TripLog = () => {
         >
           <Typography
             id="delete-modal-title"
-            variant="h5"
+            variant="h3"
             textAlign="center"
             display="flex"
             justifyContent="center"
@@ -604,7 +609,7 @@ const TripLog = () => {
             <Button
               variant="contained"
               color="error"
-              startIcon={<DeleteOutlineOutlinedIcon />}
+              startIcon={<ClearIcon />}
               onClick={handleCloseDeleteModal}
               sx={{ borderRadius: "8px" }}
             >

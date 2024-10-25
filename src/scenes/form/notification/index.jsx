@@ -135,7 +135,7 @@ const NotificationForm = () => {
           <form onSubmit={handleSubmit}>
             <Box display="grid" gap="30px" gridTemplateColumns="repeat(4, 1fr)">
               <FormControl sx={{ gridColumn: "span 4" }}>
-                <InputLabel>Title</InputLabel>
+                <InputLabel>{t("Title")}</InputLabel>
                 <OutlinedInput
                   name="title"
                   value={values.title}
@@ -149,7 +149,7 @@ const NotificationForm = () => {
               </FormControl>
 
               <FormControl sx={{ gridColumn: "span 4" }}>
-                <InputLabel>Message</InputLabel>
+                <InputLabel>{t("Message")}</InputLabel>
                 <OutlinedInput
                   name="message"
                   multiline
@@ -165,7 +165,7 @@ const NotificationForm = () => {
               </FormControl>
 
               <FormControl sx={{ gridColumn: "span 4" }}>
-                <FormLabel>Recipient Type</FormLabel>
+                <FormLabel>{t("Recipient Type")}</FormLabel>
                 <RadioGroup
                   row
                   name="recipientType"
@@ -180,19 +180,19 @@ const NotificationForm = () => {
                   <FormControlLabel
                     value="GROUP"
                     control={<Radio />}
-                    label="Group"
+                    label={t("Group")}
                   />
                   <FormControlLabel
                     value="ALL"
                     control={<Radio />}
-                    label="All Users"
+                    label={t("All Users")}
                   />
                 </RadioGroup>
               </FormControl>
 
               {values.recipientType === "GROUP" && (
                 <FormControl fullWidth sx={{ gridColumn: "span 4" }}>
-                  <InputLabel>Select Users</InputLabel>
+                  <InputLabel>{t("Select Users")}</InputLabel>
                   <Select
                     multiple
                     value={Array.isArray(values.recipientIdentifiers) ? values.recipientIdentifiers : []}
@@ -231,7 +231,7 @@ const NotificationForm = () => {
                 loading={isSubmitting}
                 startIcon={<SaveAsOutlinedIcon />}
               >
-                {notificationId ? "UPDATE" : "CREATE"}
+                {notificationId ? t("SAVE") : t("CREATE")}
               </LoadingButton>
             </Box>
           </form>

@@ -360,7 +360,7 @@ const TripForm = () => {
                   <TextField
                     {...params}
                     name="source"
-                    label={t("From")}
+                    label={t("Source")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -399,7 +399,7 @@ const TripForm = () => {
                   <TextField
                     {...params}
                     name="destination"
-                    label={t("To")}
+                    label={t("Destination")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -560,7 +560,7 @@ const TripForm = () => {
                   <FormControlLabel
                     value="true"
                     control={<Radio color="primary" />}
-                    label={t("Complete")}
+                    label={t("Completed")}
                   />
                   <FormControlLabel
                     value="false"

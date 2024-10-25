@@ -91,9 +91,10 @@ const User = () => {
         header: t("First Name"),
         accessorKey: "firstName",
         footer: "First Name",
-        width: 150,
-        maxWidth: 200,
+        width: 100,
+        maxWidth: 150,
         isEllipsis: true,
+        align: "center",
       },
       {
         header: t("Last Name"),
@@ -102,7 +103,7 @@ const User = () => {
         width: 100,
         maxWidth: 150,
         isEllipsis: true,
-        align: "left",
+        align: "center",
       },
       {
         header: "Email",

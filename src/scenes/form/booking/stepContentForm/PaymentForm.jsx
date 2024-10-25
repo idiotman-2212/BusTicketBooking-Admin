@@ -17,6 +17,20 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import EventSeatIcon from "@mui/icons-material/EventSeat";
+import PaymentIcon from "@mui/icons-material/Payment";
+import StarsIcon from "@mui/icons-material/Stars";
+import RouteIcon from "@mui/icons-material/Route";
+import RoomIcon from "@mui/icons-material/Room";
+import PinDropIcon from "@mui/icons-material/PinDrop";
+import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
+import CommuteIcon from "@mui/icons-material/Commute";
+import PlaceIcon from "@mui/icons-material/Place";
+import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import { getAllCargos } from "../../../cargo/cargoQueries";
 
 const formatCurrency = (amount) => {
@@ -78,6 +92,15 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
     }));
   }, [services, setBookingData, trip, seatNumber.length, cargoList]);
 
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district, province } = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${
+      district ? ", " + district : ""
+    }${province?.name ? ", " + province.name : ""}`;
+  };
+
   return (
     <Box sx={{ mt: 4, display: "flex", justifyContent: "space-between" }}>
       <Paper elevation={3} sx={{ width: "45%", p: 3 }}>
@@ -86,16 +109,33 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         </Typography>
         <Box sx={{ mb: 2 }}>
           <Typography variant="body1">
+            <RouteIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             <strong>{t("Route")}:</strong>{" "}
             {`${trip.source.name} ${
               bookingData.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
             } ${trip.destination.name}`}
           </Typography>
-          <Typography variant="body1">
-            <strong>{t("Coach")}:</strong>{" "}
-            {`${trip.coach.name}, Type: ${trip.coach.coachType}`}
+          {/* Thêm thông tin điểm đón và trả */}
+          <Typography variant="body1" gutterBottom>
+            <RoomIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+            <strong>{t("Pick up Location")}:</strong>{" "}
+            {formatLocation(trip.pickUpLocation)}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            <PinDropIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+            <strong>{t("Drop off Location trả")}:</strong>{" "}
+            {formatLocation(trip.dropOffLocation)}
           </Typography>
           <Typography variant="body1">
+            <DirectionsBusIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+            <strong>{t("Coach")}:</strong> {`${trip.coach.name}`}
+          </Typography>
+          <Typography variant="body1" gutterBottom>
+            <CommuteIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+            <strong>{t("Coach Type")}:</strong> {trip?.coach?.coachType ?? ""}
+          </Typography>
+          <Typography variant="body1">
+            <CalendarMonthIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             <strong>{t("Datetime")}:</strong>{" "}
             {format(
               parse(trip.departureDateTime, "yyyy-MM-dd HH:mm", new Date()),
@@ -103,12 +143,14 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             )}
           </Typography>
           <Typography variant="body1">
+            <PaymentIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             <strong>{t("Total")}:</strong>{" "}
             {`${formatCurrency(totalPayment)} (${
               seatNumber.length
             } x ${formatCurrency(getBookingPrice(trip))})`}
           </Typography>
           <Typography variant="body1">
+            <EventSeatIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             <strong>{t("Seats")}:</strong> {seatNumber.join(", ")}
           </Typography>
         </Box>
@@ -209,13 +251,23 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           <Grid item xs={12}>
             <TextField
               fullWidth
-              label={t("Pickup Address *")}
-              name="pickUpAddress"
-              value={values.pickUpAddress}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              error={touched.pickUpAddress && Boolean(errors.pickUpAddress)}
-              helperText={touched.pickUpAddress && errors.pickUpAddress}
+              label={t("Pick Up Location")}
+              variant="outlined"
+              name="pickUpLocation"
+              value={formatLocation(trip.pickUpLocation)}
+              error={touched.pickUpLocation && Boolean(errors.pickUpLocation)}
+              helperText={touched.pickUpLocation && errors.pickUpLocation}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label={t("Drop off Location")}
+              variant="outlined"
+              name="dropOffLocation"
+              value={formatLocation(trip.dropOffLocation)}
+              error={touched.dropOffLocation && Boolean(errors.dropOffLocation)}
+              helperText={touched.dropOffLocation && errors.dropOffLocation}
             />
           </Grid>
         </Grid>

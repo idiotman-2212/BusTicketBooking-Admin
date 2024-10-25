@@ -25,7 +25,8 @@ import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import * as reviewApi from "../review/reviewQueries";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { useQueryString } from "../../utils/useQueryString"; // Import useQueryString
 
 const Review = () => {
   const theme = useTheme();
@@ -38,10 +39,23 @@ const Review = () => {
   const [openUserModal, setOpenUserModal] = useState(false);
   const [openTripModal, setOpenTripModal] = useState(false);
 
+  const [queryObj, setSearchParams] = useQueryString();
+  const page = Number(queryObj?.page) || 1; // Trang mặc định là 1
+  const limit = Number(queryObj?.limit) || 5; // Số mục mặc định là 5
+
+  const [pagination, setPagination] = useState({
+    pageIndex: page - 1,
+    pageSize: limit,
+  });
+
   // Fetch all reviews
   const { data } = useQuery({
-    queryKey: ["reviews"],
-    queryFn: reviewApi.getAll, // API to fetch all reviews
+    queryKey: ["reviews", pagination],
+    queryFn: () => {
+      setSearchParams({ page: pagination.pageIndex + 1, limit: pagination.pageSize });
+      return reviewApi.getPageOfReviews(pagination.pageIndex, pagination.pageSize);
+    },
+    keepPreviousData: true, // Giữ dữ liệu trước đó trong khi tải dữ liệu mới
   });
 
   // Render stars for rating
@@ -59,11 +73,18 @@ const Review = () => {
     return stars;
   };
 
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district, province } = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${district ? ", " + district : ""}${province?.name ? ", " + province.name : ""}`;
+  };
+
   // Define columns for reviews
   const columns = useMemo(
     () => [
       {
-        header: t("User"),
+        header: t("Customer"),
         accessorKey: "user.username",
         footer: "User",
         width: 100,
@@ -71,11 +92,7 @@ const Review = () => {
         cell: (info) => {
           const { user } = info.row.original;
           return (
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-around"
-            >
+            <Box display="flex" alignItems="center" justifyContent="space-around">
               {user?.username || t("Unknown User")}
               <IconButton
                 onClick={() => {
@@ -137,11 +154,7 @@ const Review = () => {
         cell: (info) => {
           const { trip } = info.row.original;
           return (
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-around"
-            >
+            <Box display="flex" alignItems="center" justifyContent="space-around">
               {trip?.source?.name} ➔ {trip?.destination?.name}
               <IconButton
                 onClick={() => {
@@ -180,14 +193,29 @@ const Review = () => {
   const handleCloseUserModal = () => setOpenUserModal(false);
   const handleCloseTripModal = () => setOpenTripModal(false);
 
+  // Khai báo userDetail và tripDetail
+  const userDetail = selectedRow
+    ? data?.dataList?.find((r) => r.id === selectedRow)?.user
+    : null;
+
+  const tripDetail = selectedRow
+    ? data?.dataList?.find((r) => r.id === selectedRow)?.trip
+    : null;
+
   // Set up react-table with data and columns
   const table = useReactTable({
-    data: data ?? [],
+    data: data?.dataList ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    state: { globalFilter: filtering },
+    pageCount: data?.pageCount ?? -1,
+    state: {
+      pagination,
+      globalFilter: filtering,
+    },
+    onPaginationChange: setPagination,
     onGlobalFilterChange: setFiltering,
+    manualPagination: true,
   });
 
   return (
@@ -196,12 +224,7 @@ const Review = () => {
         <Header title={t("Reviews")} subTitle={t("Manage all reviews")} />
 
         {/* Search input */}
-        <Box
-          width="350px"
-          display="flex"
-          bgcolor={colors.primary[400]}
-          borderRadius="3px"
-        >
+        <Box width="350px" display="flex" bgcolor={colors.primary[400]} borderRadius="3px">
           <InputBase
             sx={{ ml: 2, flex: 1 }}
             placeholder={t("Search")}
@@ -212,21 +235,21 @@ const Review = () => {
             <SearchIcon />
           </IconButton>
         </Box>
-
-        {/* <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => navigate("report")}
-        >
-          Xem báo cáo
-        </Button> */}
       </Box>
 
       {/* Review Table */}
       <CustomDataTable table={table} colors={colors} />
 
       {/* User Modal */}
-      <Modal open={openUserModal} onClose={handleCloseUserModal}>
+      <Modal
+        sx={{
+          "& .MuiBox-root": {
+            bgcolor: theme.palette.mode === "dark" ? colors.primary[400] : "#fff",
+          },
+        }}
+        open={openUserModal}
+        onClose={handleCloseUserModal}
+      >
         <Box
           sx={{
             position: "absolute",
@@ -234,36 +257,37 @@ const Review = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
-            bgcolor: "background.paper",
             border: "2px solid #000",
             boxShadow: 24,
             p: 4,
           }}
         >
-          <Typography variant="h5">{t("User Details")}</Typography>
-          {selectedRow && (
+          <Typography textAlign="center" variant="h4">
+            {t("USER DETAIL")}
+          </Typography>
+          {userDetail && (
             <>
               <TextField
-                label="First Name"
-                value={data.find((r) => r.id === selectedRow)?.user.firstName}
+                label={t("First Name")}
+                value={userDetail.firstName || ""}
                 fullWidth
                 margin="normal"
               />
               <TextField
-                label="Last Name"
-                value={data.find((r) => r.id === selectedRow)?.user.lastName}
+                label={t("Last Name")}
+                value={userDetail.lastName || ""}
                 fullWidth
                 margin="normal"
               />
               <TextField
                 label="Email"
-                value={data.find((r) => r.id === selectedRow)?.user.email}
+                value={userDetail.email || ""}
                 fullWidth
                 margin="normal"
               />
               <TextField
-                label="Phone"
-                value={data.find((r) => r.id === selectedRow)?.user.phone}
+                label={t("Phone")}
+                value={userDetail.phone || ""}
                 fullWidth
                 margin="normal"
               />
@@ -273,7 +297,15 @@ const Review = () => {
       </Modal>
 
       {/* Trip Modal */}
-      <Modal open={openTripModal} onClose={handleCloseTripModal}>
+      <Modal
+        sx={{
+          "& .MuiBox-root": {
+            bgcolor: theme.palette.mode === "dark" ? colors.primary[400] : "#fff",
+          },
+        }}
+        open={openTripModal}
+        onClose={handleCloseTripModal}
+      >
         <Box
           sx={{
             position: "absolute",
@@ -281,60 +313,47 @@ const Review = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: 400,
-            bgcolor: "background.paper",
-            border: "2px solid #000",
+            border: "10px",
             boxShadow: 24,
             p: 4,
           }}
         >
-          <Typography variant="h5">{t("Trip Details")}</Typography>
-          {selectedRow && (
+          <Typography variant="h5">{t("TRIP DETAIL")}</Typography>
+          {tripDetail && (
             <>
               <TextField
-                label="Source"
-                value={data.find((r) => r.id === selectedRow)?.trip.source.name}
+                label={t("From")}
+                value={formatLocation(tripDetail?.pickUpLocation) || ""}
                 fullWidth
                 margin="normal"
               />
               <TextField
-                label="Destination"
-                value={
-                  data.find((r) => r.id === selectedRow)?.trip.destination.name
-                }
+                label={t("To")}
+                value={formatLocation(tripDetail?.dropOffLocation) || ""}
                 fullWidth
                 margin="normal"
               />
               <TextField
-                label="Driver Name"
-                value={`${
-                  data.find((r) => r.id === selectedRow)?.trip.driver.firstName
-                } ${
-                  data.find((r) => r.id === selectedRow)?.trip.driver.lastName
-                }`}
+                label={t("Driver Name")}
+                value={`${tripDetail?.driver?.firstName || ""} ${tripDetail?.driver?.lastName || ""}`}
                 fullWidth
                 margin="normal"
               />
               <TextField
-                label="Coach Name"
-                value={data.find((r) => r.id === selectedRow)?.trip.coach.name}
+                label={t("Coach Name")}
+                value={tripDetail?.coach?.name || ""}
                 fullWidth
                 margin="normal"
               />
               <TextField
-                label="Departure Time"
-                value={
-                  data.find((r) => r.id === selectedRow)?.trip.departureDateTime
-                }
+                label={t("Departure DateTime")}
+                value={tripDetail?.departure_date_time || ""}
                 fullWidth
                 margin="normal"
               />
               <TextField
-                label="Completed"
-                value={
-                  data.find((r) => r.id === selectedRow)?.trip.completed
-                    ? "Yes"
-                    : "No"
-                }
+                label={t("Completed")}
+                value={tripDetail?.completed ? "Yes" : "No"}
                 fullWidth
                 margin="normal"
               />

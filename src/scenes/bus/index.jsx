@@ -57,6 +57,7 @@ const Bus = () => {
         width: 150,
         maxWidth: 200,
         isEllipsis: true,
+        align: "center",
       },
       {
         header: t("Capacity"),

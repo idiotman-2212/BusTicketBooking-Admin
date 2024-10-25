@@ -24,6 +24,7 @@ import { handleToast } from "../../utils/helpers";
 import { useQueryString } from "../../utils/useQueryString";
 import * as notificationApi from "./notificationQueries";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
+import { useTranslation } from "react-i18next";
 
 const Notifications = () => {
   const theme = useTheme();
@@ -33,33 +34,37 @@ const Notifications = () => {
   const [selectedRow, setSelectedRow] = useState("");
   const [filtering, setFiltering] = useState("");
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   // Cấu trúc cột cho bảng thông báo
   const columns = useMemo(
     () => [
       {
-        header: "Title",
+        header: t("Title"),
         accessorKey: "title",
         footer: "Title",
         width: 150,
         maxWidth: 200,
         isEllipsis: true,
+        align: "center",
       },
       {
-        header: "Message",
+        header: t("Message"),
         accessorKey: "message",
         footer: "Message",
         width: 200,
         maxWidth: 300,
         isEllipsis: true,
+        align: "center",
       },
       {
-        header: "Recipient Identifiers",
+        header: t("Recipient Identifiers"),
         accessorKey: "recipientIdentifiers",
         footer: "Recipient Identifiers",
         width: 180,
         maxWidth: 250,
         isEllipsis: true,
+        align: "center",
         filterFn: (row, columnId, filterValue) => {
           const recipientIds = Array.isArray(row.original.recipientIdentifiers)
             ? row.original.recipientIdentifiers
@@ -68,7 +73,7 @@ const Notifications = () => {
         },
       },
       {
-        header: "Recipient Type",
+        header: t("Recipient Type"),
         accessorKey: "recipientType",
         footer: "Recipient Type",
         width: 100,
@@ -78,7 +83,7 @@ const Notifications = () => {
         //filterFn: 'equalsString',
       },
       {
-        header: "Send Date/Time",
+        header: t("Send Date/Time"),
         accessorKey: "sendDateTime",
         footer: "Send Date/Time",
         width: 200,
@@ -88,7 +93,7 @@ const Notifications = () => {
         cell: (info) => new Date(info.getValue()).toLocaleString(),
       },
       {
-        header: "Action",
+        header: t("Action"),
         accessorKey: "action",
         footer: "Action",
         width: 120,
@@ -96,12 +101,12 @@ const Notifications = () => {
         align: "center",
         cell: (info) => (
           <Box>
-            <CustomToolTip title="Edit" placement="top">
+            <CustomToolTip title={t("Edit")} placement="top">
               <IconButton onClick={() => handleOpenUpdateForm(info.row.original.id)}>
                 <EditOutlinedIcon />
               </IconButton>
             </CustomToolTip>
-            <CustomToolTip title="Delete" placement="top">
+            <CustomToolTip title={t("Delete")} placement="top">
               <IconButton onClick={() => handleOpenDeleteForm(info.row.original.id)}>
                 <DeleteOutlineOutlinedIcon />
               </IconButton>
@@ -195,7 +200,7 @@ const Notifications = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="NOTIFICATIONS" subTitle="Notification management" />
+        <Header title={t("Notifications")} subTitle={t("Notification management")} />
 
         {/* Ô tìm kiếm trong bảng */}
         <Box
@@ -207,7 +212,7 @@ const Notifications = () => {
         >
           <InputBase
             sx={{ ml: 2, flex: 1 }}
-            placeholder="Search"
+            placeholder={t("Search")}
             value={filtering}
             onChange={(e) => setFiltering(e.target.value)}
           />
@@ -223,7 +228,7 @@ const Notifications = () => {
           startIcon={<AddIcon />}
           size="large"
         >
-          Add new
+          {t("Add new")}
         </Button>
       </Box>
 
@@ -236,6 +241,12 @@ const Notifications = () => {
 
       {/* Modal xóa thông báo */}
       <Modal
+      sx={{
+          "& .MuiBox-root": {
+            bgcolor:
+              theme.palette.mode === "dark" ? colors.blueAccent[700] : "#fff",
+          },
+        }}
         open={openModal}
         onClose={() => setOpenModal(false)}
         aria-labelledby="modal-modal-title"
@@ -264,7 +275,7 @@ const Notifications = () => {
             <WarningRoundedIcon
               sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }}
             />
-            Delete Notification&nbsp;
+            {t("Delete Notification")}&nbsp;
             <span style={{ fontStyle: "italic" }}>{selectedRow}?</span>
           </Typography>
           <Box sx={{ mt: 3 }} display="flex" justifyContent="space-around">
@@ -274,14 +285,14 @@ const Notifications = () => {
               startIcon={<CheckIcon />}
               onClick={handleDeleteNotification}
             >
-              Confirm
+              {t("Confirm")}
             </Button>
             <Button
               variant="contained"
               color="error"
               onClick={() => setOpenModal(false)}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
           </Box>
         </Box>

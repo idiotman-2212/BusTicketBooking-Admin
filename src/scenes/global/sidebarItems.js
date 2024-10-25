@@ -10,6 +10,7 @@ import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined
 import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import EventNoteOutlinedIcon from "@mui/icons-material/EventNoteOutlined";
+import RouteOutlinedIcon from '@mui/icons-material/RouteOutlined';
 
 import { useTranslation } from "react-i18next";
 
@@ -31,6 +32,11 @@ export const sidebarItems = () => {
             title: t('Trip'),
             to: '/trips',
             icon: TripOutlinedIcon
+        },
+        {
+            title: t('Location'),
+            to: '/locations',
+            icon: RouteOutlinedIcon
         },
         {
             title: t('Driver'),

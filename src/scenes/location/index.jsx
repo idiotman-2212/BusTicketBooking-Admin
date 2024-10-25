@@ -7,6 +7,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import HomeIcon from '@mui/icons-material/Home';
+import BusinessIcon from '@mui/icons-material/Business';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import MapIcon from '@mui/icons-material/Map';
 
 import {
   Box,
@@ -24,21 +28,20 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import React, { useMemo, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import CustomDataTable from "../../components/CustomDataTable";
 import CustomToolTip from "../../components/CustomToolTip";
 import Header from "../../components/Header";
 import { tokens } from "../../theme";
 import { handleToast } from "../../utils/helpers";
 import { useQueryString } from "../../utils/useQueryString";
-import * as tripApi from "./tripQueries";
+import * as locationApi from "./locationQueries";
 import { hasPermissionToDoAction } from "../../utils/CrudPermission";
-import { parse, format } from "date-fns";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
 
-const Trip = () => {
+const Location = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
@@ -48,7 +51,7 @@ const Trip = () => {
   const [filtering, setFiltering] = useState("");
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const queryClient = useQueryClient();
 
@@ -56,78 +59,65 @@ const Trip = () => {
   const columns = useMemo(
     () => [
       {
-        header: t("Coach"),
-        accessorKey: "coach",
-        footer: "Coach",
-        width: 120,
+        header: (
+        <>
+          <LocationOnIcon sx={{ verticalAlign: "middle", marginRight: "8px" }} />
+          {t("Address")}
+        </>
+      ),
+        accessorKey: "address",
+        footer: "Address",
+        width: 200,
+        maxWidth: 300,
+        isEllipsis: true,
+        align: "center",
+      },
+      {
+        header: (
+        <>
+          <MapIcon sx={{ verticalAlign: "middle", marginRight: "8px" }} />
+          {t("District")}
+        </>
+      ),
+        accessorKey: "district",
+        footer: "District",
+        width: 150,
         maxWidth: 200,
         isEllipsis: true,
         align: "center",
-        cell: (info) => {
-          const { name, coachType } = info.getValue();
-          return `${name} (${coachType})`;
-        },
       },
       {
-        header: t("Source"),
-        accessorKey: "source",
-        footer: "Source",
-        width: 100,
-        maxWidth: 150,
-        isEllipsis: true,
-        align: "center",
-        cell: (info) => {
-          const { name } = info.getValue();
-          return `${name}`;
-        },
-      },
-      {
-        header: t("Destination"),
-        accessorKey: "destination",
-        footer: "Destination",
-        width: 100,
-        maxWidth: 150,
-        isEllipsis: true,
-        align: "center",
-        cell: (info) => {
-          const { name } = info.getValue();
-          return `${name}`;
-        },
-      },
-      {
-        header: t("Price"),
-        accessorKey: "price",
-        footer: "Price",
-        width: 70,
+        header: (
+        <>
+          <BusinessIcon sx={{ verticalAlign: "middle", marginRight: "8px" }} />
+          {t("Ward")}
+        </>
+      ),
+        accessorKey: "ward",
+        footer: "Ward",
+        width: 150,
         maxWidth: 200,
+        isEllipsis: true,
         align: "center",
       },
       {
-        header: t("Departure DateTime"),
-        accessorKey: "departureDateTime",
-        footer: "Departure Time",
+        header: (
+        <>
+          <HomeIcon sx={{ verticalAlign: "middle", marginRight: "8px" }} />
+          {t("Province")}
+        </>
+      ),
+        accessorFn: (row) => row.province.name, // Truy cập thuộc tính name trong province
+        id: "province",
+        footer: "Province",
         width: 150,
         maxWidth: 200,
         align: "center",
-        cell: (info) => {
-          return format(
-            parse(info.getValue(), "yyyy-MM-dd HH:mm", new Date()),
-            "HH:mm dd-MM-yyyy"
-          );
-        },
       },
       {
-        header: t("Driver Name"),
-        accessorFn: (row) => row.driver.fullName, // Truy cập thuộc tính fullName trong driver
-        footer: "Driver Name",
-        width: 150,
-        maxWidth: 200,
-        align: "center",
-      },     
-      {
-        header: t("Completed"),
-        accessorKey: "completed",
-        footer: "Completed",
+        header: t("Active"),
+        accessorKey: "isActive",
+        footer: "Active",
         width: 100,
         maxWidth: 150,
         align: "center",
@@ -138,7 +128,6 @@ const Trip = () => {
             <CloseIcon sx={{ color: "#eb0014" }} /> // Màu đỏ cho dấu x
           ),
       },
-       
       {
         header: t("Action"),
         accessorKey: "action",
@@ -184,26 +173,25 @@ const Trip = () => {
     pageSize: limit,
   });
 
-  // Get page of Users
+  // Get page of Locations
   const { data } = useQuery({
-    queryKey: ["trips", pagination],
+    queryKey: ["locations", pagination],
     queryFn: () => {
       setSearchParams({
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
       });
-      return tripApi.getPageOfTrips(pagination.pageIndex, pagination.pageSize);
+      return locationApi.getPageOfLocations(pagination.pageIndex, pagination.pageSize);
     },
     keepPreviousData: true,
   });
 
-  const prefetchAllTrips = async () => {
+  const prefetchAllLocations = async () => {
     await queryClient.prefetchQuery({
-      queryKey: ["trips", "all"],
-      queryFn: () => tripApi.getAll(),
+      queryKey: ["locations", "all"],
+      queryFn: () => locationApi.getAll(),
     });
   };
-
 
   const handleOpenAddNewForm = () => {
     const hasAddPermission = hasPermissionToDoAction(
@@ -246,20 +234,20 @@ const Trip = () => {
 
   // create deleteMutation chưa hiển thị toast(thành công/thất bại)
   const deleteMutation = useMutation({
-    mutationFn: (tripId) => tripApi.deleteTrip(tripId),
+    mutationFn: (locationId) => locationApi.deleteLocation(locationId),
   });
 
-  // Handle delete Coach
-  const handleDeleteTrip = (tripId) => {
-    deleteMutation.mutate(tripId, {
+  // Handle delete Location
+  const handleDeleteLocation = (locationId) => {
+    deleteMutation.mutate(locationId, {
       onSuccess: (data) => {
         setOpenModal(!openModal);
-        queryClient.invalidateQueries({ queryKey: ["trips", pagination] });
-        queryClient.removeQueries({ queryKey: ["trips"], type: "inactive" });
+        queryClient.invalidateQueries({ queryKey: ["locations", pagination] });
+        queryClient.removeQueries({ queryKey: ["locations"], type: "inactive" });
         handleToast("success", data);
       },
       onError: (error) => {
-        console.log("Delete Trip ", error);
+        console.log("Delete Location ", error);
         handleToast("error", error.response?.data.message);
       },
     });
@@ -283,7 +271,7 @@ const Trip = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title={t("TRIPS")} subTitle={t("Trip management")} />
+        <Header title={t("LOCATIONS")} subTitle={t("Location management")} />
         {/*Table search input */}
         <Box
           width="350px"
@@ -296,7 +284,7 @@ const Trip = () => {
             sx={{ ml: 2, flex: 1 }}
             placeholder={t("Search")}
             value={filtering}
-            onMouseEnter={async () => await prefetchAllTrips()}
+            onMouseEnter={async () => await prefetchAllLocations()}
             onClick={() => {
               table.setPageSize(data?.totalElements);
             }}
@@ -306,7 +294,6 @@ const Trip = () => {
             <SearchIcon />
           </IconButton>
         </Box>
-        {/* <Link to="new" style={{ alignSelf: "end", marginBottom: "30px" }}> */}
         <Button
           onClick={handleOpenAddNewForm}
           variant="contained"
@@ -316,7 +303,6 @@ const Trip = () => {
         >
           {t("Add new")}
         </Button>
-        {/* </Link> */}
       </Box>
 
       {/* Table */}
@@ -362,7 +348,7 @@ const Trip = () => {
             <WarningRoundedIcon
               sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }}
             />{" "}
-            {t("Delete Trip")}&nbsp;
+            {t("Delete Location")}&nbsp;
             <span
               style={{
                 fontStyle: "italic",
@@ -381,7 +367,7 @@ const Trip = () => {
               variant="contained"
               color="success"
               startIcon={<CheckIcon />}
-              onClick={() => handleDeleteTrip(selectedRow)}
+              onClick={() => handleDeleteLocation(selectedRow)}
             >
               {t("Confirm")}
             </Button>
@@ -441,4 +427,4 @@ const Trip = () => {
   );
 };
 
-export default Trip;
+export default Location;

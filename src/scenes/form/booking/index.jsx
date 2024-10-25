@@ -53,6 +53,15 @@ const BookingForm = () => {
     });
   };
 
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district, province } = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${
+      district ? ", " + district : ""
+    }${province?.name ? ", " + province.name : ""}`;
+  };
+
   return (
     <Box m="20px">
       <Header title={t("EDIT BOOKING")} subTitle={t("Edit booking profile")} />
@@ -97,8 +106,12 @@ const BookingForm = () => {
                     {`${values.phone}`}
                   </Typography>
                   <Typography component="span" variant="h5">
-                    <span style={{ fontWeight: "bold" }}>{t("Pickup Address")}: </span>
-                    {`${values.pickUpAddress}`}
+                    <span style={{ fontWeight: "bold" }}>{t("Pickup Location")}: </span>
+                    {formatLocation(bookingQuery.data.trip.pickUpLocation)}
+                  </Typography>
+                  <Typography component="span" variant="h5">
+                    <span style={{ fontWeight: "bold" }}>{t("Dropoff Location")}: </span>
+                    {formatLocation(bookingQuery.data.trip.dropOffLocation)}
                   </Typography>
                   <Typography component="span" variant="h5">
                     <span style={{ fontWeight: "bold" }}>{t("Route")}: </span>
