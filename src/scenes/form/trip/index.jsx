@@ -34,6 +34,7 @@ import * as discountApi from "../../discount/discountQueries";
 import * as driverApi from "../../driver/driverQueries";
 import * as provinceApi from "../../global/provinceQueries";
 import * as tripApi from "../../trip/tripQueries";
+import * as locationApi from "../../location/locationQueries";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useTranslation } from "react-i18next";
@@ -51,6 +52,8 @@ const initialValues = {
   coach: null,
   source: null,
   destination: null,
+  pickUpLocation: null,
+  dropOffLocation: null,
   discount: null,
   price: 0,
   departureDateTime: format(new Date(), "yyyy-MM-dd HH:mm"),
@@ -75,6 +78,8 @@ const tripSchema = yup.object().shape({
     .test("destination", "Destination is the same as Source", (value, ctx) => {
       return value.id !== ctx.parent.source.id;
     }),
+    pickUpLocation: yup.object().required("Required"),
+  dropOffLocation: yup.object().required("Required"),
   discount: yup.object().notRequired(),
   price: yup.number().positive("Price must be positive").default(1),
   departureDateTime: yup.string().required("Required"),
@@ -96,6 +101,11 @@ const TripForm = () => {
   const [provinceClicked, setProvinceClicked] = useState(false);
   const [discountClicked, setDiscountClicked] = useState(false);
   const { t } = useTranslation();
+  const [pickUpLocations, setPickUpLocations] = useState([]);
+  const [dropOffLocations, setDropOffLocations] = useState([]);
+  const [isLoadingPickUp, setIsLoadingPickUp] = useState(false);
+  const [isLoadingDropOff, setIsLoadingDropOff] = useState(false);
+
 
   // prepare data (driver, coach, source, destination, ...) for autocomplete combobox
   const driverQuery = useQuery({
@@ -208,6 +218,45 @@ const TripForm = () => {
     } catch (error) {
       console.error("Error:", error);
       handleToast("error", "An error occurred while processing the trip.");
+    }
+  };
+
+  const handleSourceChange = async (newValue, setFieldValue) => {
+    setFieldValue("source", newValue);
+    setFieldValue("pickUpLocation", null);
+    
+    if (newValue) {
+      setIsLoadingPickUp(true);
+      try {
+        const locations = await locationApi.getLocationsByProvinceId(newValue.id);
+        setPickUpLocations(locations);
+      } catch (error) {
+        console.error("Error fetching pickup locations:", error);
+        handleToast("error", "Failed to load pickup locations");
+      }
+      setIsLoadingPickUp(false);
+    } else {
+      setPickUpLocations([]);
+    }
+  };
+
+  // Function to fetch locations when destination is selected
+  const handleDestinationChange = async (newValue, setFieldValue) => {
+    setFieldValue("destination", newValue);
+    setFieldValue("dropOffLocation", null);
+    
+    if (newValue) {
+      setIsLoadingDropOff(true);
+      try {
+        const locations = await locationApi.getLocationsByProvinceId(newValue.id);
+        setDropOffLocations(locations);
+      } catch (error) {
+        console.error("Error fetching dropoff locations:", error);
+        handleToast("error", "Failed to load dropoff locations");
+      }
+      setIsLoadingDropOff(false);
+    } else {
+      setDropOffLocations([]);
     }
   };
 
@@ -345,22 +394,21 @@ const TripForm = () => {
                   />
                 )}
               />
+              {/* Source Province Autocomplete */}
               <Autocomplete
                 id="source-province-autocomplete"
                 value={values.source}
                 onOpen={handleProvinceOpen}
-                onChange={(e, newValue) => setFieldValue("source", newValue)}
+                onChange={(e, newValue) => handleSourceChange(newValue, setFieldValue)}
                 getOptionLabel={(option) => option.name}
                 options={provinceQuery.data ?? []}
                 loading={provinceClicked && provinceQuery.isLoading}
-                sx={{
-                  gridColumn: "span 2",
-                }}
+                sx={{ gridColumn: "span 2" }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     name="source"
-                    label={t("Source")}
+                    label={t("Source Province")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -382,24 +430,22 @@ const TripForm = () => {
                   />
                 )}
               />
+
+              {/* Destination Province Autocomplete */}
               <Autocomplete
                 id="dest-province-autocomplete"
                 value={values.destination}
                 onOpen={handleProvinceOpen}
-                onChange={(e, newValue) =>
-                  setFieldValue("destination", newValue)
-                }
+                onChange={(e, newValue) => handleDestinationChange(newValue, setFieldValue)}
                 getOptionLabel={(option) => option.name}
                 options={provinceQuery.data ?? []}
                 loading={provinceClicked && provinceQuery.isLoading}
-                sx={{
-                  gridColumn: "span 2",
-                }}
+                sx={{ gridColumn: "span 2" }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     name="destination"
-                    label={t("Destination")}
+                    label={t("Destination Province")}
                     color="warning"
                     size="small"
                     fullWidth
@@ -407,11 +453,74 @@ const TripForm = () => {
                     onBlur={handleBlur}
                     error={!!touched.destination && !!errors.destination}
                     helperText={touched.destination && errors.destination}
+                  />
+                )}
+              />
+
+              {/* Pickup Location Autocomplete */}
+              <Autocomplete
+                id="pickUp-location-autocomplete"
+                value={values.pickUpLocation}
+                onChange={(e, newValue) => setFieldValue("pickUpLocation", newValue)}
+                options={pickUpLocations}
+                getOptionLabel={(option) => option.name}
+                loading={isLoadingPickUp}
+                disabled={!values.source}
+                sx={{ gridColumn: "span 2" }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    name="pickUpLocation"
+                    label={t("Pickup Location")}
+                    color="warning"
+                    size="small"
+                    fullWidth
+                    variant="outlined"
+                    onBlur={handleBlur}
+                    error={!!touched.pickUpLocation && !!errors.pickUpLocation}
+                    helperText={touched.pickUpLocation && errors.pickUpLocation}
                     InputProps={{
                       ...params.InputProps,
                       endAdornment: (
                         <>
-                          {provinceClicked && provinceQuery.isLoading ? (
+                          {isLoadingPickUp ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+              />
+
+              {/* Dropoff Location Autocomplete */}
+              <Autocomplete
+                id="dropOff-location-autocomplete"
+                value={values.dropOffLocation}
+                onChange={(e, newValue) => setFieldValue("dropOffLocation", newValue)}
+                options={dropOffLocations}
+                getOptionLabel={(option) => option.name}
+                loading={isLoadingDropOff}
+                disabled={!values.destination}
+                sx={{ gridColumn: "span 2" }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    name="dropOffLocation"
+                    label={t("Dropoff Location")}
+                    color="warning"
+                    size="small"
+                    fullWidth
+                    variant="outlined"
+                    onBlur={handleBlur}
+                    error={!!touched.dropOffLocation && !!errors.dropOffLocation}
+                    helperText={touched.dropOffLocation && errors.dropOffLocation}
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {isLoadingDropOff ? (
                             <CircularProgress color="inherit" size={20} />
                           ) : null}
                           {params.InputProps.endAdornment}

@@ -5,9 +5,9 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
-import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
-import CloseIcon from '@mui/icons-material/Close';
-
+import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
+import CloseIcon from "@mui/icons-material/Close";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import {
   Modal,
   Typography,
   useTheme,
+  Divider,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -48,9 +49,29 @@ const Trip = () => {
   const [filtering, setFiltering] = useState("");
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
-  const {t} = useTranslation();
+  const { t } = useTranslation();
+
+  const [openLocationModal, setOpenLocationModal] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [locationType, setLocationType] = useState("");
 
   const queryClient = useQueryClient();
+
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district, province } = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${
+      district ? ", " + district : ""
+    }${province?.name ? ", " + province.name : ""}`;
+  };
+
+   const handleOpenLocationModal = (type, info) => {
+    const location = type === "source" ? info.pickUpLocation : info.dropOffLocation;
+    setSelectedLocation(location);
+    setLocationType(type);
+    setOpenLocationModal(true);
+  };
 
   // Columns
   const columns = useMemo(
@@ -72,26 +93,46 @@ const Trip = () => {
         header: t("Source"),
         accessorKey: "source",
         footer: "Source",
-        width: 100,
+        width: 150,
         maxWidth: 150,
         isEllipsis: true,
         align: "center",
         cell: (info) => {
           const { name } = info.getValue();
-          return `${name}`;
+          return (
+            <>
+              {name}
+              <IconButton
+                onClick={() => handleOpenLocationModal("source", info.row.original)}
+                aria-label="source location"
+              >
+                <LocationOnIcon color="primary" />
+              </IconButton>
+            </>
+          );
         },
       },
       {
         header: t("Destination"),
         accessorKey: "destination",
         footer: "Destination",
-        width: 100,
+        width: 150,
         maxWidth: 150,
         isEllipsis: true,
         align: "center",
         cell: (info) => {
           const { name } = info.getValue();
-          return `${name}`;
+          return (
+            <>
+              {name}
+              <IconButton
+                onClick={() => handleOpenLocationModal("destination", info.row.original)}
+                aria-label="destination location"
+              >
+                <LocationOnIcon color="primary" />
+              </IconButton>
+            </>
+          );
         },
       },
       {
@@ -123,7 +164,7 @@ const Trip = () => {
         width: 150,
         maxWidth: 200,
         align: "center",
-      },     
+      },
       {
         header: t("Completed"),
         accessorKey: "completed",
@@ -138,7 +179,7 @@ const Trip = () => {
             <CloseIcon sx={{ color: "#eb0014" }} /> // Màu đỏ cho dấu x
           ),
       },
-       
+
       {
         header: t("Action"),
         accessorKey: "action",
@@ -203,7 +244,6 @@ const Trip = () => {
       queryFn: () => tripApi.getAll(),
     });
   };
-
 
   const handleOpenAddNewForm = () => {
     const hasAddPermission = hasPermissionToDoAction(
@@ -325,6 +365,75 @@ const Trip = () => {
         colors={colors}
         totalElements={data?.totalElements}
       />
+      {/* Location Modal */}
+      <Modal
+      sx={{
+          "& .MuiBox-root": {
+            bgcolor:
+              theme.palette.mode === "dark" ? colors.blueAccent[700] : "#fff",
+          },
+        }}
+        open={openLocationModal}
+        onClose={() => setOpenLocationModal(false)}
+        aria-labelledby="location-modal-title"
+        aria-describedby="location-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: theme.palette.mode === "dark" ? colors.blueAccent[700] : "#fff",
+            borderRadius: "10px",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography textAlign="center" fontWeight="bold" variant="h5" id="location-modal-title" gutterBottom>
+            {locationType === "source" ? t("Pick-up Point") : t("Drop-off Point")}
+          </Typography>
+          <Divider sx={{ my: 2 }} />
+          
+          {selectedLocation ? (
+            <Box>
+              <Typography variant="subtitle1" gutterBottom>
+                <strong>{t("Address")}:</strong> {selectedLocation.address}
+              </Typography>
+              {selectedLocation.ward && (
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>{t("Ward")}:</strong> {selectedLocation.ward}
+                </Typography>
+              )}
+              {selectedLocation.district && (
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>{t("District")}:</strong> {selectedLocation.district}
+                </Typography>
+              )}
+              {selectedLocation.province && (
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>{t("Province")}:</strong> {selectedLocation.province.name}
+                </Typography>
+              )}
+            </Box>
+          ) : (
+            <Typography variant="subtitle1" color="text.secondary">
+              {t("Chưa xác định")}
+            </Typography>
+          )}
+          
+          {/* <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+            <Button
+              variant="contained"
+              onClick={() => setOpenLocationModal(false)}
+              color="primary"
+            >
+              {t("Close")}
+            </Button>
+          </Box> */}
+        </Box>
+      </Modal>
 
       {/* MODAL */}
       <Modal

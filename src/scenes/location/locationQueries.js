@@ -15,7 +15,7 @@ import { http } from "../../utils/http";
 };
 
 // Lấy địa điểm theo tỉnh
- const getLocationsByProvince = async (provinceId) => {
+ const getLocationsByProvinceId = async (provinceId) => {
     const response = await http.get(`/locations/province/${provinceId}`);
     return response.data;
 };
@@ -47,7 +47,7 @@ export {
     getAllLocations,
     getLocationById,
     getPageOfLocations,
-    getLocationsByProvince,
+    getLocationsByProvinceId,
     createLocation,
     updateLocation,
     deleteLocation,
