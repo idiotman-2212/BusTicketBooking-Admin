@@ -78,27 +78,44 @@ const CargoForm = () => {
 
   // Handle form submission
   const handleFormSubmit = async (values, { resetForm }) => {
-    let { isEditMode, ...newValues } = values; // Remove isEditMode before submission
-
+    let { isEditMode, ...newValues } = values;
+  
     try {
-      // Quyết định giữa tạo mới và cập nhật
+      // Sử dụng mutateAsync và truyền onError để xử lý lỗi
       const action = isAddMode
-        ? mutation.mutateAsync(newValues)  // Tạo mới
-        : updateMutation.mutateAsync(newValues); // Cập nhật với body là newValues
-
+        ? mutation.mutateAsync(newValues, {
+            onError: (error) => {
+              console.error("Error response from backend:", error.response);
+  
+              // Lấy thông báo lỗi từ trường 'message' trong phản hồi
+              const errorMessage = error.response?.data?.message || "An error occurred";
+              handleToast("error", errorMessage);
+            },
+            onSuccess: () => {
+              resetForm();
+              handleToast("success", t("Add new location successfully"));
+            },
+          })
+        : updateMutation.mutateAsync(newValues, {
+            onError: (error) => {
+              console.error("Error response from backend:", error.response);
+  
+              const errorMessage = error.response?.data?.message || "An error occurred";
+              handleToast("error", errorMessage);
+            },
+            onSuccess: () => {
+              resetForm();
+              handleToast("success", t("Update location successfully"));
+            },
+          });
+  
       await action;
-      resetForm();
-      handleToast(
-        "success",
-        isAddMode ? t("Cargo added successfully") : t("Cargo updated successfully")
-      );
-
-      queryClient.invalidateQueries(["cargos"]); // Refresh cache
+      queryClient.invalidateQueries(["locations"]); // Refresh cache
     } catch (error) {
       console.error("Error:", error);
-      handleToast("error", "An error occurred while processing the cargo.");
     }
   };
+  
 
   return (
     <Box m="20px">
@@ -201,31 +218,7 @@ const CargoForm = () => {
                 }}
               />
 
-              {/* Chỉ hiển thị trường isDeleted khi chỉnh sửa */}
-              {!isAddMode && (
-                <FormControl sx={{ gridColumn: "span 2" }}>
-                  <FormLabel>{t("Is Deleted")}</FormLabel>
-                  <RadioGroup
-                    row
-                    name="isDeleted"
-                    value={values.isDeleted ? "true" : "false"}
-                    onChange={(e) =>
-                      setFieldValue("isDeleted", e.target.value === "true")
-                    }
-                  >
-                    <FormControlLabel
-                      value="false"
-                      control={<Radio />}
-                      label={t("Active")}
-                    />
-                    <FormControlLabel
-                      value="true"
-                      control={<Radio />}
-                      label={t("Deleted")}
-                    />
-                  </RadioGroup>
-                </FormControl>
-              )}
+              
             </Box>
             <Box mt="20px" display="flex" justifyContent="center">
               <LoadingButton

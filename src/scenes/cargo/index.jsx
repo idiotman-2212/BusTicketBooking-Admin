@@ -81,9 +81,9 @@ const Cargo = () => {
         align: "center",
       },
       {
-        header: t("Deleted"),
-        accessorKey: "isDeleted",
-        footer: "Delete",
+        header: t("Active"),
+        accessorKey: "active",
+        footer: "Active",
         width: 100,
         maxWidth: 150,
         align: "center",

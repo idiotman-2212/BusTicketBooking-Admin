@@ -116,7 +116,7 @@ const { data, isLoading: isLocationLoading } = useQuery({
       queryClient.invalidateQueries(["locations"]); // Refresh cache
     } catch (error) {
       console.error("Error:", error);
-      handleToast("error", "An error occurred while processing the location.");
+      //handleToast("error", "An error occurred while processing the location.");
     }
   };
 

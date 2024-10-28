@@ -140,7 +140,7 @@ const Trip = () => {
         accessorKey: "price",
         footer: "Price",
         width: 70,
-        maxWidth: 200,
+        maxWidth: 150,
         align: "center",
       },
       {
@@ -148,7 +148,7 @@ const Trip = () => {
         accessorKey: "departureDateTime",
         footer: "Departure Time",
         width: 150,
-        maxWidth: 200,
+        maxWidth: 150,
         align: "center",
         cell: (info) => {
           return format(
@@ -162,15 +162,15 @@ const Trip = () => {
         accessorFn: (row) => row.driver.fullName, // Truy cập thuộc tính fullName trong driver
         footer: "Driver Name",
         width: 150,
-        maxWidth: 200,
+        maxWidth: 150,
         align: "center",
       },
       {
         header: t("Completed"),
         accessorKey: "completed",
         footer: "Completed",
-        width: 100,
-        maxWidth: 150,
+        width: 50,
+        maxWidth: 50,
         align: "center",
         cell: (info) =>
           info.getValue() ? (
@@ -184,8 +184,8 @@ const Trip = () => {
         header: t("Action"),
         accessorKey: "action",
         footer: "Action",
-        width: 120,
-        maxWidth: 250,
+        width: 100,
+        maxWidth: 200,
         align: "center",
         cell: (info) => {
           return (

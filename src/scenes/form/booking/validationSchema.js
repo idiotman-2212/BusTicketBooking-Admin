@@ -16,7 +16,6 @@ export default [
         seatNumber: yup.array().required("Required").min(1, "Must select at least 1 seat"),
     }),
     yup.object().shape({
-        pickUpAddress: yup.string().required("Required"),
         firstName: yup.string().required("Required"),
         lastName: yup.string().required("Required"),
         phone: yup

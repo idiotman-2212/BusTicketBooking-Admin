@@ -16,7 +16,6 @@ import validationSchema from "./validationSchema";
 import * as bookingApi from "../../ticket/ticketQueries";
 import { useMutation } from "@tanstack/react-query";
 import { handleToast } from "../../../utils/helpers";
-import { useTranslation } from "react-i18next";
 
 const initialValues = {
   id: -1,
@@ -29,7 +28,6 @@ const initialValues = {
   bookingDateTime: format(new Date(), "yyyy-MM-dd HH:mm"),
   seatNumber: [], // user can choose max 5 seat, in that case: create 5 tickets
   bookingType: "ONEWAY",
-  pickUpAddress: "",
   firstName: "", // used for create user
   lastName: "", // used for create user
   phone: "", // used for create user
@@ -37,12 +35,13 @@ const initialValues = {
   totalPayment: 0,
   paymentDateTime: format(new Date(), "yyyy-MM-dd HH:mm:ss"),
   paymentMethod: "CASH",
-  paymentStatus: "UNPAID",
+  paymentStatus: "PAID",
   nameOnCard: "", // used to validate when paymentMethod is CARD, remove when submit
   cardNumber: "", // used to validate when paymentMethod is CARD, remove when submit
   expiredDate: format(new Date(), "MM/yy"), // used to validate when paymentMethod is CARD, remove when submit
   cvv: "", // used to validate when paymentMethod is CARD, remove when submit
   isEditMode: false, // remove this field when submit
+  cargoRequests: [],
 };
 
 const renderStepContent = (
@@ -94,7 +93,6 @@ const StepperBooking = () => {
   const [bookingData, setBookingData] = useState(initialValues);
   const currentValidationSchema = validationSchema[activeStep];
   const isLastStep = activeStep === steps.length - 1;
-  const {t} = useTranslation();
 
   const handleNext = () => {
     setActiveStep(activeStep + 1);
@@ -111,44 +109,53 @@ const StepperBooking = () => {
 
   // main process submit form
   const submitForm = (values, actions) => {
-    console.log("Submit booking data with cargoRequests: ", values.cargoRequests); // Đảm bảo rằng cargoRequests có dữ liệu
-  
-    createMutation.mutate(values, {
-      onSuccess: () => {
-        actions.resetForm();
-        handleToast("success", t("Add new Bookings successfully"));
-      },
-      onError: (error) => {
-        console.log("Error from backend: ", error);
-        handleToast("error", error.response?.data?.message || "Unexpected error");
-      },
-    });
+    const {
+      user,
+      source,
+      destination,
+      nameOnCard,
+      cardNumber,
+      expiredDate,
+      cvv,
+      isEditMode,
+      ...newValues
+    } = values;
+
+    newValues.cargoRequests = bookingData.cargoRequests;
+
+    actions.setSubmitting(false);
+
+    if (isAddMode) {
+      createMutation.mutate(newValues, {
+        onSuccess: () => {
+          actions.resetForm();
+          handleToast("success", "Add new Bookings successfully");
+        },
+        onError: (error) => {
+          console.log(error);
+          handleToast("error", error.response?.data?.message);
+        },
+      });
+    } else {
+    }
+    setActiveStep(0);
+    // handleNext();  // khi nao thanh cong thi chuyen trang success
   };
-  
 
   // handle submit
   const handleFormSubmit = (values, actions) => {
-    // Đồng bộ hóa cargoRequests từ bookingData vào values
-    const updatedValues = {
-        ...values,
-        cargoRequests: bookingData.cargoRequests || []
-    };
-
-    console.log("Submit booking data with cargoRequests: ", updatedValues.cargoRequests);
-
     if (isLastStep) {
-        submitForm(updatedValues, actions);
+      submitForm(values, actions);
     } else {
-        handleNext();
-        actions.setSubmitting(false);
-        setBookingData(updatedValues); // Cập nhật lại vào bookingData để giữ đồng bộ
+      handleNext();
+      actions.setSubmitting(false);
+      setBookingData(values);
     }
-};
-
+  };
 
   return (
     <Box m="20px">
-      <Header title={undefined} subTitle={t("CREATE BOOKING")} />
+      <Header title={undefined} subTitle={"CREATE BOOKING"} />
 
       <Box m="0 30px">
         <Stepper activeStep={activeStep}>
@@ -159,7 +166,7 @@ const StepperBooking = () => {
           ))}
         </Stepper>
         {activeStep === steps.length ? (
-          <Typography>{t("All steps are finished")}</Typography>
+          <Typography>All steps are finished</Typography>
         ) : (
           <Formik
             onSubmit={handleFormSubmit}
@@ -185,7 +192,7 @@ const StepperBooking = () => {
                       variant="contained"
                       onClick={handleBack}
                     >
-                      {t("Back")}
+                      Back
                     </Button>
                   )}
                   <LoadingButton
@@ -197,7 +204,7 @@ const StepperBooking = () => {
                     loading={isSubmitting}
                     startIcon={<SaveAsOutlinedIcon />}
                   >
-                    {!isLastStep ? t("NEXT") : isAddMode ? t("CREATE") : t("SAVE")}
+                    {!isLastStep ? "NEXT" : isAddMode ? "CREATE" : "SAVE"}
                   </LoadingButton>
                 </Box>
               </form>

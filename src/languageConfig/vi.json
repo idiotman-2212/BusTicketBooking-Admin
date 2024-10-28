@@ -244,5 +244,7 @@
 "Create a new trip log": "Tạo mới nhật ký chuyến đi",
 "Delete Trip Log": "Xóa nhật ký chuyến đi",
 "Are you sure you want to delete trip log with ID":"Bạn có chắc chắn muốn xóa nhật ký chuyến đi có ID không",
-"Trip Logs": "Nhật ký chuyến đi"
+"Trip Logs": "Nhật ký chuyến đi",
+"DOWN STAIR": "TẦNG DƯỚI",
+"UP STAIR": "TẦNG TRÊN"
 }

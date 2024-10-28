@@ -44,8 +44,15 @@ const getAvailableBooking = async () => {
 }
 
 const createNewBookings = async (newBookings) => {
-    const resp = await http.post("/bookings/site2", newBookings)
+    console.log("Create new bookings", newBookings)
+    try {
+        const resp = await http.post("/bookings/site2", newBookings)
+        console.log("New bookings created", resp);
     return resp.data
+    } catch (error) {
+        console.error('createNewBookings error:', error);
+    throw error; 
+    }
 }
 
 const updateBooking = async (updatedBooking) => {

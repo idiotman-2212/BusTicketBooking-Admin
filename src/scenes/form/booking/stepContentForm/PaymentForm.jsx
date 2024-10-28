@@ -17,19 +17,12 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import EventSeatIcon from "@mui/icons-material/EventSeat";
 import PaymentIcon from "@mui/icons-material/Payment";
-import StarsIcon from "@mui/icons-material/Stars";
 import RouteIcon from "@mui/icons-material/Route";
 import RoomIcon from "@mui/icons-material/Room";
 import PinDropIcon from "@mui/icons-material/PinDrop";
-import DirectionsCarIcon from "@mui/icons-material/DirectionsCar";
-import CommuteIcon from "@mui/icons-material/Commute";
-import PlaceIcon from "@mui/icons-material/Place";
 import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
 import { getAllCargos } from "../../../cargo/cargoQueries";
 
@@ -50,19 +43,16 @@ const getBookingPrice = (trip) => {
 };
 
 const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
-  const { trip, bookingDateTime, seatNumber, totalPayment } = bookingData;
+  const { trip, bookingDateTime, seatNumber } = bookingData;
   const { values, errors, touched, setFieldValue, handleChange, handleBlur } =
     field;
   const { t } = useTranslation();
   const [cardPaymentSelect, setCardPaymentSelect] = useState(
     bookingData.paymentMethod === "CARD"
   );
+
   const [services, setServices] = useState([]);
-  const {
-    data: cargoList = [],
-    isLoading,
-    error,
-  } = useQuery(["cargoList"], getAllCargos);
+  const { data: cargoList = [] } = useQuery(["cargoList"], getAllCargos);
 
   const handleServiceChange = (cargoId, quantity) => {
     setServices((prevServices) => {
@@ -94,7 +84,6 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
 
   const formatLocation = (location) => {
     if (!location) return t("Chưa xác định");
-
     const { address, ward, district, province } = location;
     return `${address || ""}${ward ? ", " + ward : ""}${
       district ? ", " + district : ""
@@ -115,7 +104,6 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               bookingData.bookingType === "ONEWAY" ? `\u21D2` : `\u21CB`
             } ${trip.destination.name}`}
           </Typography>
-          {/* Thêm thông tin điểm đón và trả */}
           <Typography variant="body1" gutterBottom>
             <RoomIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             <strong>{t("Pick up Location")}:</strong>{" "}
@@ -123,7 +111,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           </Typography>
           <Typography variant="body1" gutterBottom>
             <PinDropIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-            <strong>{t("Drop off Location trả")}:</strong>{" "}
+            <strong>{t("Drop off Location")}:</strong>{" "}
             {formatLocation(trip.dropOffLocation)}
           </Typography>
           <Typography variant="body1">
@@ -131,10 +119,6 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
             <strong>{t("Coach")}:</strong> {`${trip.coach.name}`}
           </Typography>
           <Typography variant="body1" gutterBottom>
-            <CommuteIcon sx={{ mr: 1, verticalAlign: "middle" }} />
-            <strong>{t("Coach Type")}:</strong> {trip?.coach?.coachType ?? ""}
-          </Typography>
-          <Typography variant="body1">
             <CalendarMonthIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             <strong>{t("Datetime")}:</strong>{" "}
             {format(
@@ -145,7 +129,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           <Typography variant="body1">
             <PaymentIcon sx={{ mr: 1, verticalAlign: "middle" }} />
             <strong>{t("Total")}:</strong>{" "}
-            {`${formatCurrency(totalPayment)} (${
+            {`${formatCurrency(bookingData.totalPayment)} (${
               seatNumber.length
             } x ${formatCurrency(getBookingPrice(trip))})`}
           </Typography>
@@ -191,7 +175,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
         </Box>
         <Divider sx={{ my: 2 }} />
         <Typography variant="h6" fontWeight="bold">
-          {t("Total Payment")}: {formatCurrency(totalPayment)}
+          {t("Total Payment")}: {formatCurrency(bookingData.totalPayment)}
         </Typography>
       </Paper>
 
@@ -239,7 +223,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
           <Grid item xs={6}>
             <TextField
               fullWidth
-              label="Email *"
+              label={t("Email *")}
               name="email"
               value={values.email}
               onChange={handleChange}
@@ -248,6 +232,23 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
               helperText={touched.email && errors.email}
             />
           </Grid>
+          {/* <Grid item xs={12}>
+            <TextField
+              color="warning"
+              size="small"
+              fullWidth
+              variant="outlined"
+              type="text"
+              label="Pickup Address *"
+              onBlur={handleBlur}
+              onChange={handleChange}
+              value={values.pickUpAddress}
+              name="pickUpAddress"
+              error={!!touched.pickUpAddress && !!errors.pickUpAddress}
+              helperText={touched.pickUpAddress && errors.pickUpAddress}
+              sx={{ gridColumn: "span 4" }}
+            />
+          </Grid> */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -291,6 +292,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 control={<Radio />}
                 label={t("CASH")}
               />
+              {/* Uncomment to add CARD option */}
               {/* <FormControlLabel
                 value="CARD"
                 control={<Radio />}
@@ -310,6 +312,7 @@ const PaymentForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                 value={values.paymentStatus}
                 onChange={(e) => setFieldValue("paymentStatus", e.target.value)}
               >
+                {/* Uncomment to add UNPAID option */}
                 {/* <FormControlLabel
                   value="UNPAID"
                   control={<Radio />}

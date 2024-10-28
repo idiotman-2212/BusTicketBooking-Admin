@@ -173,20 +173,34 @@ const CoachModel = (props) => {
       >
         {Object.keys(seatData).map((stair, index) => (
           <Box
-            key={index}
-            display="grid"
-            gridTemplateColumns="repeat(3, minmax(0, 1fr))" // Hiển thị 3 ghế trên mỗi hàng
+            key={stair}
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
           >
-            {Object.entries(seatData[stair]).map(([seatNumber, seat]) => (
-              <SeatModel
-                key={seatNumber}
-                handleSeatChoose={memoizedHandleSeatChoose}
-                seat={seat}
-                selectedSeats={selectedSeats}
-                orderedSeats={orderedSeats}
-                coachType={coachType}
-              />
-            ))}
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              // mb={2}
+              //color={colors.greenAccent[400]}
+            >
+              {stair === "DOWN_STAIR" ? t("DOWN STAIR") : stair === "UP_STAIR" ? t("UP STAIR") : ""}
+            </Typography>
+            <Box
+              display="grid"
+              gridTemplateColumns="repeat(3, minmax(0, 1fr))"
+            >
+              {Object.entries(seatData[stair]).map(([seatNumber, seat]) => (
+                <SeatModel
+                  key={seatNumber}
+                  handleSeatChoose={memoizedHandleSeatChoose}
+                  seat={seat}
+                  selectedSeats={selectedSeats}
+                  orderedSeats={orderedSeats}
+                  coachType={coachType}
+                />
+              ))}
+            </Box>
           </Box>
         ))}
       </Box>
