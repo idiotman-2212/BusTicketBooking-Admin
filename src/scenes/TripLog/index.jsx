@@ -72,6 +72,13 @@ const TripLog = () => {
     enabled: !!username,
   });
 
+  const formatLocation = (location) => {
+    if (!location) return t("Chưa xác định");
+
+    const { address, ward, district, province } = location;
+    return `${address || ""}${ward ? ", " + ward : ""}${district ? ", " + district : ""}${province?.name ? ", " + province.name : ""}`;
+  };
+  
   const columns = useMemo(
     () => [
       {
@@ -337,7 +344,7 @@ const TripLog = () => {
           }}
         >
           <Box textAlign="center" marginBottom="30px">
-            <Typography variant="h4">{t("TRIP DETAIL")}</Typography>
+            <Typography fontWeight="bold" variant="h4">{t("TRIP DETAIL")}</Typography>
           </Box>
           {tripQuery.isLoading ? (
             <Stack spacing={1}>
@@ -356,8 +363,8 @@ const TripLog = () => {
                 variant="outlined"
                 type="text"
                 label={t("Source")}
-                value={tripQuery.data?.source?.name || "N/A"}
-                sx={{ gridColumn: "span 2" }}
+                value={formatLocation(tripQuery.data?.pickUpLocation) || ""}
+                sx={{ gridColumn: "span 4" }}
               />
               <TextField
                 size="small"
@@ -365,8 +372,8 @@ const TripLog = () => {
                 variant="outlined"
                 type="text"
                 label={t("Destination")}
-                value={tripQuery.data?.destination?.name || "N/A"}
-                sx={{ gridColumn: "span 2" }}
+                value={formatLocation(tripQuery.data?.dropOffLocation) || ""}
+                sx={{ gridColumn: "span 4" }}
               />
               <TextField
                 size="small"
@@ -470,7 +477,7 @@ const TripLog = () => {
           }}
         >
           <Box textAlign="center" marginBottom="30px">
-            <Typography variant="h4">{t("USER DETAIL")}</Typography>
+            <Typography fontWeight="bold" variant="h4">{t("USER DETAIL")}</Typography>
           </Box>
           {userQuery.isLoading ? (
             <Stack spacing={1}>

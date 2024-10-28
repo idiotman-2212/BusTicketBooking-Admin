@@ -262,7 +262,7 @@ const Review = () => {
             p: 4,
           }}
         >
-          <Typography textAlign="center" variant="h4">
+          <Typography textAlign="center" variant="h4" fontWeight="bold">
             {t("USER DETAIL")}
           </Typography>
           {userDetail && (
@@ -318,17 +318,17 @@ const Review = () => {
             p: 4,
           }}
         >
-          <Typography variant="h5">{t("TRIP DETAIL")}</Typography>
+          <Typography fontWeight="bold" variant="h4">{t("TRIP DETAIL")}</Typography>
           {tripDetail && (
             <>
               <TextField
-                label={t("From")}
+                label={t("Source")}
                 value={formatLocation(tripDetail?.pickUpLocation) || ""}
                 fullWidth
                 margin="normal"
               />
               <TextField
-                label={t("To")}
+                label={t("Destination")}
                 value={formatLocation(tripDetail?.dropOffLocation) || ""}
                 fullWidth
                 margin="normal"
@@ -347,7 +347,7 @@ const Review = () => {
               />
               <TextField
                 label={t("Departure DateTime")}
-                value={tripDetail?.departure_date_time || ""}
+                value={tripDetail?.departureDateTime || ""}
                 fullWidth
                 margin="normal"
               />
