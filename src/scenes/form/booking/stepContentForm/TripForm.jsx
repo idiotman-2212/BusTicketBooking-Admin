@@ -47,6 +47,42 @@ const getBookingPriceString = (trip) => {
   }).format(finalPrice);
 };
 
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
+};
+
+const getDiscountedPriceDisplay = (trip) => {
+  const originalPrice = trip.price;
+  let finalPrice = originalPrice;
+
+  // Tính toán giá sau khi giảm
+  if (!isNaN(trip?.discount?.amount)) {
+    finalPrice -= trip.discount.amount;
+  }
+
+  // Trả về JSX hiển thị giá gốc (gạch ngang) nếu có giảm giá và giá mới
+  return (
+    <span>
+      {originalPrice !== finalPrice && (
+        <Typography
+          component="span"
+          color="textSecondary"
+          sx={{ textDecoration: "line-through", marginRight: "8px" }}
+        >
+          {formatCurrency(originalPrice)}
+        </Typography>
+      )}
+      <Typography component="span" color="error">
+        {formatCurrency(finalPrice)}
+      </Typography>
+    </span>
+  );
+};
+
+
 const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -437,7 +473,8 @@ const TripForm = ({ field, setActiveStep, bookingData, setBookingData }) => {
                         <span
                           style={{ fontWeight: "bold", fontStyle: "italic" }}
                         >
-                          {trip.price ? getBookingPriceString(trip) : "none"}
+                          {/* {trip.price ? getBookingPriceString(trip) : "none"} */}
+                          {trip.price ? getDiscountedPriceDisplay(trip) : "none"}
                         </span>{" "}
                         {"(included discount)"},{" "}
                         <span
