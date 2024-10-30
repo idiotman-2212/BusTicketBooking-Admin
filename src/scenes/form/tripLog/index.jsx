@@ -17,7 +17,7 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import * as tripLogApi from "../../TripLog/tripLogQueries";
-import * as tripApi from "../../Trip/tripQueries";
+import * as tripApi from "../../trip/tripQueries.js";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
