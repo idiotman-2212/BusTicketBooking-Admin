@@ -8,6 +8,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import PriorityHighOutlinedIcon from "@mui/icons-material/PriorityHighOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
+import PrintOutlinedIcon from "@mui/icons-material/PrintOutlined";
 import {
   Box,
   Button,
@@ -16,6 +17,7 @@ import {
   Modal,
   Skeleton,
   Stack,
+  Divider,
   TextField,
   Typography,
   useTheme,
@@ -40,12 +42,20 @@ import * as ticketApi from "./ticketQueries";
 import { parse, format } from "date-fns";
 import { hasPermissionToDoAction } from "../../utils/CrudPermission";
 import { useTranslation } from "react-i18next";
+import { QRCodeCanvas } from "qrcode.react";
 
 const getBookingDateFormat = (bookingDateTime) => {
   return format(
     parse(bookingDateTime, "yyyy-MM-dd HH:mm", new Date()),
     "dd/MM/yyyy"
   );
+};
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(amount);
 };
 
 const Ticket = () => {
@@ -57,12 +67,12 @@ const Ticket = () => {
   const [openTripModal, setOpenTripModal] = useState(false);
   const [openBookingModal, setOpenBookingModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState("");
-  // const [selectedUser, setSelectedUser] = useState("");
-  // const [selectedTrip, setSelectedTrip] = useState("");
   const [filtering, setFiltering] = useState("");
   const [openForbiddenModal, setOpenForbiddenModal] = useState(false);
   const [forbiddenMessage, setForbiddenMessage] = useState("");
-const {t} = useTranslation();
+  const { t } = useTranslation();
+  const [selectedPrintTicket, setSelectedPrintTicket] = useState(null);
+  const [openPrintModal, setOpenPrintModal] = useState(false);
 
   const queryClient = useQueryClient();
 
@@ -74,35 +84,29 @@ const {t} = useTranslation();
 
   const formatLocation = (location) => {
     if (!location) return t("Chưa xác định");
-  
+
     const { address, ward, district, province } = location;
-    return `${address || ""}${ward ? ", " + ward : ""}${district ? ", " + district : ""}${province?.name ? ", " + province.name : ""}`;
+    return `${address || ""}${ward ? ", " + ward : ""}${
+      district ? ", " + district : ""
+    }${province?.name ? ", " + province.name : ""}`;
   };
 
-  
-  // const userQuery = useQuery({
-  //   queryKey: ["users", selectedUser],
-  //   queryFn: () => userApi.getUser(selectedUser),
-  //   enabled: selectedUser !== "",
-  // });
+  const handleOpenPrintModal = (ticketId) => {
+    setSelectedPrintTicket(ticketId);
+    setSelectedRow(ticketId); // Đặt selectedRow để `bookingQuery` tải dữ liệu
+    setOpenPrintModal(true);
+  };
 
-  // const tripQuery = useQuery({
-  //   queryKey: ["trips", selectedTrip],
-  //   queryFn: () => tripApi.getTrip(selectedTrip),
-  //   enabled: selectedTrip !== "",
-  // });
-
-  // Columns
   const columns = useMemo(
     () => [
       {
         header: t("Customer"),
         accessorKey: "custFirstName",
         footer: "First Name",
-        width: 150,
+        width: 100,
         maxWidth: 250,
         isEllipsis: true,
-        filterFn: 'includesString',  // Áp dụng hàm lọc theo chuỗi
+        filterFn: "includesString", // Áp dụng hàm lọc theo chuỗi
         cell: (info) => {
           const { custFirstName, custLastName } = info.row.original;
           return (
@@ -131,18 +135,18 @@ const {t} = useTranslation();
         header: t("Phone"),
         accessorKey: "phone",
         footer: "Phone",
-        width: 150,
-        maxWidth: 200,
+        width: 100,
+        maxWidth: 150,
         align: "center",
         cell: (info) => info.getValue(),
-        filterFn: 'includesString', // Hàm lọc cho cột này
+        filterFn: "includesString", // Hàm lọc cho cột này
       },
       {
         header: t("Trip"),
         accessorKey: "trip",
         footer: "Trip",
-        width: 350,
-        maxWidth: 400,
+        width: 250,
+        maxWidth: 3500,
         isEllipsis: true,
         align: "center",
         cell: (info) => {
@@ -176,16 +180,16 @@ const {t} = useTranslation();
         header: t("Seat Number"),
         accessorKey: "seatNumber",
         footer: "Seat Number",
-        width: 80,
-        maxWidth: 200,
+        width: 20,
+        maxWidth: 80,
         align: "center",
       },
       {
         header: t("Payment"),
         accessorKey: "payment",
         footer: "Payment",
-        width: 100,
-        maxWidth: 200,
+        width: 70,
+        maxWidth: 150,
         align: "center",
         cell: (info) => {
           const { paymentStatus } = info.row.original;
@@ -238,6 +242,13 @@ const {t} = useTranslation();
                   <DeleteOutlineOutlinedIcon />
                 </IconButton>
               </CustomToolTip>
+              <CustomToolTip title="Print Ticket" placement="top">
+                <IconButton
+                  onClick={() => handleOpenPrintModal(info.row.original.id)}
+                >
+                  <PrintOutlinedIcon />
+                </IconButton>
+              </CustomToolTip>
             </Box>
           );
         },
@@ -265,7 +276,7 @@ const {t} = useTranslation();
       });
       return ticketApi.getPageOfBookings(
         pagination.pageIndex,
-        pagination.pageSize,
+        pagination.pageSize
       );
     },
     keepPreviousData: true,
@@ -317,29 +328,27 @@ const {t} = useTranslation();
     }
   };
 
-  // create deleteMutation chưa hiển thị toast(thành công/thất bại)
   const deleteMutation = useMutation({
     mutationFn: (bookingId) => ticketApi.deleteBooking(bookingId),
   });
 
-  // Handle delete Coach
   const handleDeleteBooking = (bookingId) => {
     deleteMutation.mutate(bookingId, {
-        onSuccess: (data) => {
-            setOpenModal(!openModal);
-            queryClient.invalidateQueries({ queryKey: ["bookings", pagination] });
-            handleToast("success", data); // Hiển thị toast thành công
-        },
-        onError: (error) => {
-            console.log("Delete Booking ", error);
-            // Hiển thị toast error từ thông điệp lỗi được trả về
-            handleToast("error", error.response?.data?.message || "Failed to delete booking.");
-        },
+      onSuccess: (data) => {
+        setOpenModal(!openModal);
+        queryClient.invalidateQueries({ queryKey: ["bookings", pagination] });
+        handleToast("success", data); // Hiển thị toast thành công
+      },
+      onError: (error) => {
+        console.log("Delete Booking ", error);
+        handleToast(
+          "error",
+          error.response?.data?.message || "Failed to delete booking."
+        );
+      },
     });
-};
+  };
 
-
-  //xử lý search
   const table = useReactTable({
     data: data?.dataList ?? [], // if data is not available, provide empty dataList []
     columns,
@@ -348,19 +357,17 @@ const {t} = useTranslation();
     pageCount: data?.pageCount ?? -1,
     state: {
       pagination,
-      globalFilter: filtering,// Cập nhật globalFilter với giá trị filtering
+      globalFilter: filtering, // Cập nhật globalFilter với giá trị filtering
     },
     onPaginationChange: setPagination,
     onGlobalFilterChange: setFiltering, // Cập nhật giá trị filtering khi có thay đổi
     manualPagination: true,
   });
 
-  
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title={t("Bookings")} subTitle={t("Booking management")} />
-        {/*Table search input */}
         <Box
           width="350px"
           height="40px"
@@ -395,7 +402,6 @@ const {t} = useTranslation();
         {/* </Link> */}
       </Box>
 
-      {/* Table */}
       <CustomDataTable
         table={table}
         colors={colors}
@@ -437,9 +443,7 @@ const {t} = useTranslation();
           </Box>
           {bookingQuery.isLoading ? (
             <Stack spacing={1}>
-              {/* For variant="text", adjust the height via font-size */}
               <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
-              {/* For other variants, adjust the size with `width` and `height` */}
               <Skeleton variant="circular" width={40} height={40} />
               <Skeleton variant="rectangular" width={210} height={60} />
               <Skeleton variant="rounded" width={210} height={60} />
@@ -550,9 +554,7 @@ const {t} = useTranslation();
           </Box>
           {bookingQuery.isLoading ? (
             <Stack spacing={1}>
-              {/* For variant="text", adjust the height via font-size */}
               <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
-              {/* For other variants, adjust the size with `width` and `height` */}
               <Skeleton variant="circular" width={40} height={40} />
               <Skeleton variant="rectangular" width={210} height={60} />
               <Skeleton variant="rounded" width={210} height={60} />
@@ -703,9 +705,7 @@ const {t} = useTranslation();
           </Box>
           {bookingQuery.isLoading ? (
             <Stack spacing={1}>
-              {/* For variant="text", adjust the height via font-size */}
               <Skeleton variant="text" sx={{ fontSize: "1rem" }} />
-              {/* For other variants, adjust the size with `width` and `height` */}
               <Skeleton variant="circular" width={40} height={40} />
               <Skeleton variant="rectangular" width={210} height={60} />
               <Skeleton variant="rounded" width={210} height={60} />
@@ -880,6 +880,179 @@ const {t} = useTranslation();
               {t("Cancel")}
             </Button>
           </Box>
+        </Box>
+      </Modal>
+
+      {/* Print booking */}
+      <Modal
+        open={openPrintModal}
+        onClose={() => setOpenPrintModal(false)}
+        aria-labelledby="print-ticket-modal"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            p: 4,
+            bgcolor: "white",
+            borderRadius: 2,
+            width: "500px",
+            maxHeight: "90%",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            overflow: "auto",
+          }}
+        >
+          {selectedPrintTicket && bookingQuery?.data ? (
+            <Box
+              sx={{
+                border: "2px solid #1976d2",
+                borderRadius: 2,
+                p: 3,
+                position: "relative",
+              }}
+            >
+              <Box
+                sx={{
+                  textAlign: "center",
+                  mb: 3,
+                  borderBottom: "2px dashed #1976d2",
+                  pb: 2,
+                }}
+              >
+                <Typography
+                  variant="h3"
+                  sx={{
+                    color: "#1976d2",
+                    fontWeight: "bold",
+                    mb: 1,
+                  }}
+                >
+                  BOOKING TICKET
+                </Typography>
+                <Typography variant="subtitle1" color="text.secondary">
+                  {formatLocation(bookingQuery?.data?.trip.pickUpLocation)}
+                  <Box
+                  >
+                    {"→"}
+                  </Box>
+                  {formatLocation(bookingQuery?.data?.trip.dropOffLocation)}
+                </Typography>
+              </Box>
+
+              <Box
+                sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}
+              >
+                <Box>
+                  <Typography variant="h6" color="text.secondary">
+                    <strong>Passenger Name:</strong>
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
+                    {`${bookingQuery.data.custFirstName} ${bookingQuery.data.custLastName}`}
+                  </Typography>
+
+                  <Typography variant="h6" color="text.secondary">
+                    <strong>Phone:</strong>
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
+                    {bookingQuery.data.phone}
+                  </Typography>
+
+                  <Typography variant="h6" color="text.secondary">
+                    <strong>Email:</strong>
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
+                    {bookingQuery.data.email ?? "Not provided"}
+                  </Typography>
+                </Box>
+
+                <Box>
+                  <Typography variant="h6" color="text.secondary">
+                    <strong>Departure Date:</strong>
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
+                    {format(
+                      parse(
+                        bookingQuery.data.trip.departureDateTime,
+                        "yyyy-MM-dd HH:mm",
+                        new Date()
+                      ),
+                      "HH:mm dd-MM-yyyy"
+                    )}
+                  </Typography>
+
+                  <Typography variant="h6" color="text.secondary">
+                    <strong>Seat Number:</strong>
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
+                    {bookingQuery.data.seatNumber}
+                  </Typography>
+
+                  <Typography variant="h6" color="text.secondary">
+                    <strong>Ticket Price:</strong>
+                  </Typography>
+                  <Typography variant="body1" sx={{ mb: 1 }}>
+                    {/* {bookingQuery.data.totalPayment} VND */}
+                    {formatCurrency(bookingQuery.data.totalPayment)}
+                  </Typography>
+                </Box>
+              </Box>
+
+              {/* QR Code */}
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 10,
+                  right: 10,
+                  width: 100,
+                  height: 100,
+                  bgcolor: "#f0f0f0",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  borderRadius: 1,
+                }}
+              >
+                <QRCodeCanvas
+                  value={JSON.stringify({
+                    ticketId: selectedPrintTicket,
+                    passengerName:
+                      bookingQuery.data.custFirstName +
+                      " " +
+                      bookingQuery.data.custLastName,
+                    departureDateTime: bookingQuery.data.trip.departureDateTime,
+                    seatNumber: bookingQuery.data.seatNumber,
+                    totalPayment: bookingQuery.data.totalPayment,
+                  })}
+                  size={100}
+                />
+              </Box>
+
+              <Box
+                sx={{
+                  mt: 3,
+                  display: "flex",
+                  justifyContent: "center",
+                  borderTop: "2px dashed #1976d2",
+                  pt: 2,
+                }}
+              >
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => window.print()}
+                  startIcon={<PrintOutlinedIcon />}
+                >
+                  Print Ticket
+                </Button>
+              </Box>
+            </Box>
+          ) : (
+            <Typography variant="h6" color="error" align="center">
+              No ticket information available.
+            </Typography>
+          )}
         </Box>
       </Modal>
 
