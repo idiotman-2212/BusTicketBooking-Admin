@@ -246,5 +246,13 @@
 "Are you sure you want to delete trip log with ID":"Bạn có chắc chắn muốn xóa nhật ký chuyến đi có ID không",
 "Trip Logs": "Nhật ký chuyến đi",
 "DOWN STAIR": "TẦNG DƯỚI",
-"UP STAIR": "TẦNG TRÊN"
+"UP STAIR": "TẦNG TRÊN",
+"TYPE": "LOẠI XE",
+"NONE": "KHÔNG",
+"Print Ticket": "In vé",
+"Passenger Name": "Tên hành khách",
+"Not provided": "Không được cung cấp",
+"No ticket information available.": "Không có thông tin vé có sẵn.",
+"Choose Trip": "Chọn chuyến",
+"Choose Seat": "Chọn chỗ"
 }

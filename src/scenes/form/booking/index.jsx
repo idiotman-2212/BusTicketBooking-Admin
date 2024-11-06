@@ -62,6 +62,10 @@ const BookingForm = () => {
     }${province?.name ? ", " + province.name : ""}`;
   };
 
+  const handleCancelBooking = () => {
+    deleteMutation.mutate();
+  };
+
   return (
     <Box m="20px">
       <Header title={t("EDIT BOOKING")} subTitle={t("Edit booking profile")} />
@@ -82,8 +86,9 @@ const BookingForm = () => {
           }) => {
             // Kiểm tra trạng thái không cho chỉnh sửa nếu paymentStatus là CANCEL hoặc REFUNDED
             const isEditable =
-              values.paymentStatus !== "CANCEL" &&
-              values.paymentStatus !== "REFUNDED";
+              values.paymentStatus !== "CANCEL" ||
+              (values.paymentStatus === "CANCEL" &&
+                values.paymentMethod === "CARD");
 
             return (
               <form onSubmit={handleSubmit}>
@@ -98,19 +103,27 @@ const BookingForm = () => {
                     {t("Summary Booking Info")}
                   </Typography>
                   <Typography component="span" variant="h5">
-                    <span style={{ fontWeight: "bold" }}>{t("Customer")}: </span>
+                    <span style={{ fontWeight: "bold" }}>
+                      {t("Customer")}:{" "}
+                    </span>
                     {`${values.custFirstName} ${values.custLastName}`}
                   </Typography>
                   <Typography component="span" variant="h5">
-                    <span style={{ fontWeight: "bold" }}>{t("Contact Phone")}: </span>
+                    <span style={{ fontWeight: "bold" }}>
+                      {t("Contact Phone")}:{" "}
+                    </span>
                     {`${values.phone}`}
                   </Typography>
                   <Typography component="span" variant="h5">
-                    <span style={{ fontWeight: "bold" }}>{t("Pickup Location")}: </span>
+                    <span style={{ fontWeight: "bold" }}>
+                      {t("Pickup Location")}:{" "}
+                    </span>
                     {formatLocation(bookingQuery.data.trip.pickUpLocation)}
                   </Typography>
                   <Typography component="span" variant="h5">
-                    <span style={{ fontWeight: "bold" }}>{t("Dropoff Location")}: </span>
+                    <span style={{ fontWeight: "bold" }}>
+                      {t("Dropoff Location")}:{" "}
+                    </span>
                     {formatLocation(bookingQuery.data.trip.dropOffLocation)}
                   </Typography>
                   <Typography component="span" variant="h5">
@@ -150,19 +163,19 @@ const BookingForm = () => {
                   </Typography>
                   {values.paymentStatus === "CANCEL" && (
                     <Typography component="span" variant="h5">
-                      <span style={{ fontWeight: "bold" }}>{t("Payment Status")}: </span>
+                      <span style={{ fontWeight: "bold" }}>
+                        {t("Payment Status")}:{" "}
+                      </span>
                       {values.paymentStatus}ED
                     </Typography>
                   )}
                 </Box>
 
                 {/* payment status */}
-                {isEditable && (
-                  <FormControl
-                    sx={{
-                      gridColumn: "span 2",
-                    }}
-                  >
+                {isEditable ||
+                (values.paymentMethod === "CARD" &&
+                  values.paymentStatus === "CANCEL") ? (
+                  <FormControl sx={{ gridColumn: "span 2" }}>
                     <FormLabel color="warning" id="paymentStatus">
                       {t("Payment Status")}
                     </FormLabel>
@@ -175,37 +188,38 @@ const BookingForm = () => {
                         setFieldValue("paymentStatus", e.target.value);
                       }}
                     >
-                      <FormControlLabel
-                        value="UNPAID"
-                        control={
-                          <Radio
-                            sx={{
-                              color: "#00a0bd",
-                              "&.Mui-checked": {
-                                color: "#00a0bd",
-                              },
-                            }}
+                      {/* Chỉ hiển thị UNPAID và PAID nếu không thanh toán bằng card hoặc chưa bị hủy */}
+                      {!(
+                        values.paymentMethod === "CARD" &&
+                        (values.paymentStatus === "CANCEL" ||
+                          values.paymentStatus === "REFUNDED")
+                      ) && (
+                        <>
+                          <FormControlLabel
+                            value="UNPAID"
+                            control={<Radio />}
+                            label={t("UNPAID")}
                           />
-                        }
-                        label={t("UNPAID")}
-                      />
-                      <FormControlLabel
-                        value="PAID"
-                        control={
-                          <Radio
-                            sx={{
-                              color: "#00a0bd",
-                              "&.Mui-checked": {
-                                color: "#00a0bd",
-                              },
-                            }}
+                          <FormControlLabel
+                            value="PAID"
+                            control={<Radio />}
+                            label={t("PAID")}
                           />
-                        }
-                        label={t("PAID")}
-                      />
+                        </>
+                      )}
+                      {/* Chỉ hiển thị REFUNDED nếu thanh toán bằng thẻ và đã hủy */}
+                      {values.paymentMethod === "CARD" &&
+                        (values.paymentStatus === "CANCEL" ||
+                          values.paymentStatus === "REFUNDED") && (
+                          <FormControlLabel
+                            value="REFUNDED"
+                            control={<Radio />}
+                            label={t("REFUNDED")}
+                          />
+                        )}
                     </RadioGroup>
                   </FormControl>
-                )}
+                ) : null}
 
                 <Box mt="20px" display="flex" justifyContent="center">
                   <LoadingButton
@@ -220,11 +234,17 @@ const BookingForm = () => {
                     {t("SAVE")}
                   </LoadingButton>
                 </Box>
-                {!isEditable && (
-                  <Typography mt="20px" textAlign="center" color="error">
-                    {t("You cannot edit this booking as it has been cancelled or refunded.")}
-                  </Typography>
-                )}
+                {!isEditable &&
+                  !(
+                    values.paymentMethod === "CARD" &&
+                    values.paymentStatus === "CANCEL"
+                  ) && (
+                    <Typography mt="20px" textAlign="center" color="error">
+                      {t(
+                        "You cannot edit this booking as it has been cancelled or refunded."
+                      )}
+                    </Typography>
+                  )}
               </form>
             );
           }}

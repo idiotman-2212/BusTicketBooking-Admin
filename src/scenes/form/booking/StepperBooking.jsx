@@ -16,6 +16,8 @@ import validationSchema from "./validationSchema";
 import * as bookingApi from "../../ticket/ticketQueries";
 import { useMutation } from "@tanstack/react-query";
 import { handleToast } from "../../../utils/helpers";
+import { useTranslation } from 'react-i18next';
+
 
 const initialValues = {
   id: -1,
@@ -84,9 +86,10 @@ const renderStepContent = (
   }
 };
 
-const steps = ["Choose Trip", "Choose Seat", "Payment"];
 
 const StepperBooking = () => {
+  const { t } = useTranslation();
+  const steps = [t("Choose Trip"), t("Choose Seat"), t("Payment")];
   const addNewMatch = useMatch("/tickets/new");
   const isAddMode = !!addNewMatch;
   const [activeStep, setActiveStep] = useState(0);
@@ -133,7 +136,12 @@ const StepperBooking = () => {
         },
         onError: (error) => {
           console.log(error);
-          handleToast("error", error.response?.data?.message);
+          if (error.response?.status === 400) { // Kiểm tra mã lỗi trùng chỗ ngồi
+            handleToast("error", "Seat already booked. Please choose a different seat.");
+            setActiveStep(1); // Quay lại bước chọn chỗ ngồi
+          } else {
+            handleToast("error", error.response?.data?.message || "Booking failed.");
+          }
         },
       });
     } else {

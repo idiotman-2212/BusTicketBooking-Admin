@@ -116,7 +116,7 @@ const Ticket = () => {
               justifyContent="space-around"
             >
               {custLastName}
-              <CustomToolTip title="Detail" placement="top">
+              <CustomToolTip title={t("Detail")} placement="top">
                 <IconButton
                   onClick={() => {
                     // setSelectedUser(username);
@@ -242,7 +242,7 @@ const Ticket = () => {
                   <DeleteOutlineOutlinedIcon />
                 </IconButton>
               </CustomToolTip>
-              <CustomToolTip title="Print Ticket" placement="top">
+              <CustomToolTip title={t("Print Ticket")} placement="top">
                 <IconButton
                   onClick={() => handleOpenPrintModal(info.row.original.id)}
                 >
@@ -662,7 +662,7 @@ const Ticket = () => {
                 value={
                   bookingQuery?.data?.trip.discount
                     ? bookingQuery?.data?.trip.discount.amount
-                    : "NONE"
+                    : t("NONE")
                 }
                 sx={{
                   gridColumn: "span 2",
@@ -796,7 +796,7 @@ const Ticket = () => {
                             "HH:mm:ss dd/MM/yyyy"
                           )}`}</Typography>
                           <Typography mt="4px" fontWeight="bold" variant="h5">
-                            {oldStatus ? oldStatus : t("CREATE")} &rArr;{" "}
+                            {oldStatus ? oldStatus : "CREATE"} &rArr;{" "}
                             {newStatus}
                           </Typography>
                         </Box>
@@ -946,30 +946,30 @@ const Ticket = () => {
               >
                 <Box>
                   <Typography variant="h6" color="text.secondary">
-                    <strong>Passenger Name:</strong>
+                    <strong>{t("Passenger Name")}:</strong>
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 1 }}>
                     {`${bookingQuery.data.custFirstName} ${bookingQuery.data.custLastName}`}
                   </Typography>
 
                   <Typography variant="h6" color="text.secondary">
-                    <strong>Phone:</strong>
+                    <strong>{t("Phone")}:</strong>
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 1 }}>
                     {bookingQuery.data.phone}
                   </Typography>
 
                   <Typography variant="h6" color="text.secondary">
-                    <strong>Email:</strong>
+                    <strong>{t("Email")}:</strong>
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 1 }}>
-                    {bookingQuery.data.email ?? "Not provided"}
+                    {bookingQuery.data.email ?? t("Not provided")}
                   </Typography>
                 </Box>
 
                 <Box>
                   <Typography variant="h6" color="text.secondary">
-                    <strong>Departure Date:</strong>
+                    <strong>{t("Departure DateTime")}:</strong>
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 1 }}>
                     {format(
@@ -983,14 +983,14 @@ const Ticket = () => {
                   </Typography>
 
                   <Typography variant="h6" color="text.secondary">
-                    <strong>Seat Number:</strong>
+                    <strong>{t("Seat Number")}:</strong>
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 1 }}>
                     {bookingQuery.data.seatNumber}
                   </Typography>
 
                   <Typography variant="h6" color="text.secondary">
-                    <strong>Ticket Price:</strong>
+                    <strong>{t("Price")}:</strong>
                   </Typography>
                   <Typography variant="body1" sx={{ mb: 1 }}>
                     {/* {bookingQuery.data.totalPayment} VND */}
@@ -1044,13 +1044,13 @@ const Ticket = () => {
                   onClick={() => window.print()}
                   startIcon={<PrintOutlinedIcon />}
                 >
-                  Print Ticket
+                  {t("Print Ticket")}
                 </Button>
               </Box>
             </Box>
           ) : (
             <Typography variant="h6" color="error" align="center">
-              No ticket information available.
+              {t("No ticket information available.")}
             </Typography>
           )}
         </Box>
