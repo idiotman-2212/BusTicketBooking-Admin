@@ -244,11 +244,11 @@ const Location = () => {
         setOpenModal(!openModal);
         queryClient.invalidateQueries({ queryKey: ["locations", pagination] });
         queryClient.removeQueries({ queryKey: ["locations"], type: "inactive" });
-        handleToast("success", data);
+        toast.success(t("Location deleted successfully"));
       },
       onError: (error) => {
         console.log("Delete Location ", error);
-        handleToast("error", error.response?.data.message);
+        toast.error(t("Failed to delete location"));
       },
     });
   };

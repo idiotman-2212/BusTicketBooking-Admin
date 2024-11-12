@@ -83,7 +83,7 @@ const tripSchema = yup.object().shape({
   discount: yup.object().notRequired(),
   price: yup.number().positive("Price must be positive").default(1),
   departureDateTime: yup.string().required("Required"),
-  duration: yup.number().notRequired(),
+  duration: yup.number().positive("Duration must be greater than 0").required("Required"),
   isEditMode: yup.boolean().default(true),
   completed: yup.boolean().default(false), // Xác định trạng thái hoàn thành
 });
