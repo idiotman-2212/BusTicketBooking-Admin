@@ -655,29 +655,32 @@ const TripForm = () => {
                 }}
               />
 
-              <FormControl>
-                <FormLabel color="warning" id="status">
-                  {t("Trip Status")}
-                </FormLabel>
-                <RadioGroup
-                  row
-                  aria-label="completed"
-                  name="completed"
-                  value={values.completed.toString()}
-                  onChange={(e) => setFieldValue("completed", e.target.value === "true")}
-                >
-                  <FormControlLabel
-                    value="true"
-                    control={<Radio color="primary" />}
-                    label={t("Completed")}
-                  />
-                  <FormControlLabel
-                    value="false"
-                    control={<Radio />}
-                    label={t("Incomplete")}
-                  />
-                </RadioGroup>
-              </FormControl>
+{!isAddMode && (
+  <FormControl>
+    <FormLabel color="warning" id="status">
+      {t("Trip Status")}
+    </FormLabel>
+    <RadioGroup
+      row
+      aria-label="completed"
+      name="completed"
+      value={values.completed.toString()}
+      onChange={(e) => setFieldValue("completed", e.target.value === "true")}
+    >
+      <FormControlLabel
+        value="true"
+        control={<Radio color="primary" />}
+        label={t("Completed")}
+      />
+      <FormControlLabel
+        value="false"
+        control={<Radio />}
+        label={t("Incomplete")}
+      />
+    </RadioGroup>
+  </FormControl>
+)}
+
             </Box>
             <Box mt="20px" display="flex" justifyContent="center">
               <LoadingButton
