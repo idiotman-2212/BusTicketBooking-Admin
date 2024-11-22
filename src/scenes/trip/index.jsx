@@ -81,7 +81,7 @@ const Trip = () => {
         accessorKey: "coach",
         footer: "Coach",
         width: 120,
-        maxWidth: 200,
+        maxWidth: 150,
         isEllipsis: true,
         align: "center",
         cell: (info) => {
@@ -93,7 +93,7 @@ const Trip = () => {
         header: t("Source"),
         accessorKey: "source",
         footer: "Source",
-        width: 150,
+        width: 200,
         maxWidth: 150,
         isEllipsis: true,
         align: "center",

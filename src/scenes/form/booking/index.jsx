@@ -166,7 +166,7 @@ const BookingForm = () => {
                       <span style={{ fontWeight: "bold" }}>
                         {t("Payment Status")}:{" "}
                       </span>
-                      {values.paymentStatus}ED
+                      {values.paymentStatus}
                     </Typography>
                   )}
                 </Box>
@@ -174,11 +174,12 @@ const BookingForm = () => {
                 {/* payment status */}
                 {isEditable ||
                 (values.paymentMethod === "CARD" &&
-                  values.paymentStatus === "CANCEL") ? (
+                  values.paymentStatus === "CANCEL"
+                  ) ? (
                   <FormControl sx={{ gridColumn: "span 2" }}>
-                    <FormLabel color="warning" id="paymentStatus">
+                    {/* <FormLabel color="warning" id="paymentStatus">
                       {t("Payment Status")}
-                    </FormLabel>
+                    </FormLabel> */}
                     <RadioGroup
                       row
                       aria-labelledby="paymentStatus"
@@ -192,6 +193,7 @@ const BookingForm = () => {
                       {!(
                         values.paymentMethod === "CARD" &&
                         (values.paymentStatus === "CANCEL" ||
+                          values.paymentStatus === "REFUND_PENDING" ||
                           values.paymentStatus === "REFUNDED")
                       ) && (
                         <>
@@ -207,14 +209,14 @@ const BookingForm = () => {
                           />
                         </>
                       )}
-                      {/* Chỉ hiển thị REFUNDED nếu thanh toán bằng thẻ và đã hủy */}
+                      {/* Chỉ hiển thị REFUND_PENDING nếu thanh toán bằng thẻ và đã hủy */}
                       {values.paymentMethod === "CARD" &&
                         (values.paymentStatus === "CANCEL" ||
-                          values.paymentStatus === "REFUNDED") && (
+                          values.paymentStatus === "REFUND_PENDING") && (
                           <FormControlLabel
-                            value="REFUNDED"
+                            value="REFUND_PENDING"
                             control={<Radio />}
-                            label={t("REFUNDED")}
+                            label={t("REFUND PENDING")}
                           />
                         )}
                     </RadioGroup>
