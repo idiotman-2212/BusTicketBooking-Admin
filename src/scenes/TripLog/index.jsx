@@ -165,13 +165,13 @@ const TripLog = () => {
                 <EditOutlinedIcon />
               </IconButton>
             </CustomToolTip>
-            <CustomToolTip title={t("Delete")} placement="top">
+            {/* <CustomToolTip title={t("Delete")} placement="top">
               <IconButton
                 onClick={() => handleOpenDeleteForm(info.row.original.id)}
               >
                 <DeleteOutlineOutlinedIcon />
               </IconButton>
-            </CustomToolTip>
+            </CustomToolTip> */}
           </Box>
         ),
       },
