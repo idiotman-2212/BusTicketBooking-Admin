@@ -161,16 +161,16 @@ const Trip = () => {
         header: t("Driver Name"),
         accessorFn: (row) => row.driver.fullName, // Truy cập thuộc tính fullName trong driver
         footer: "Driver Name",
-        width: 150,
-        maxWidth: 150,
+        width: 110,
+        maxWidth: 110,
         align: "center",
       },
       {
         header: t("Completed"),
         accessorKey: "completed",
         footer: "Completed",
-        width: 50,
-        maxWidth: 50,
+        width: 30,
+        maxWidth: 30,
         align: "center",
         cell: (info) =>
           info.getValue() ? (
@@ -185,7 +185,7 @@ const Trip = () => {
         accessorKey: "action",
         footer: "Action",
         width: 100,
-        maxWidth: 200,
+        maxWidth: 150,
         align: "center",
         cell: (info) => {
           return (

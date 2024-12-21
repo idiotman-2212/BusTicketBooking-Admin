@@ -349,7 +349,7 @@ const Driver = () => {
             <WarningRoundedIcon
               sx={{ color: "#fbc02a", fontSize: "2.5rem", marginRight: "4px" }}
             />{" "}
-            Delete User&nbsp;
+            Delete Driver&nbsp;
             <span
               style={{
                 fontStyle: "italic",

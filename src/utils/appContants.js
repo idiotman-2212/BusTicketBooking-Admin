@@ -18,10 +18,15 @@ export const SCREENS = {
     DASHBOARD: "DASHBOARD",
     TICKETS: "TICKETS",
     TRIPS: "TRIPS",
+    LOCATIONS: "LOCATIONS",
     DRIVERS: "DRIVERS",
     COACHES: "COACHES",
     DISCOUNTS: "DISCOUNTS",
     USERS: "USERS",
+    CARGOS: "CARGOS",
+    NOTIFICATIONS: "NOTIFICATIONS",
+    REVIEWS: "REVIEWS",
+    TRIPLOGS: "TRIPLOGS",
     REPORT: "REPORT",
 }
 
@@ -29,10 +34,15 @@ export const SCREEN_PATH = {
     "/dashboard": SCREENS.DASHBOARD,
     "/tickets": SCREENS.TICKETS,
     "/trips": SCREENS.TRIPS,
+    "/locations": SCREENS.LOCATIONS,
     "/drivers": SCREENS.DRIVERS,
     "/coaches": SCREENS.COACHES,
     "/discounts": SCREENS.DISCOUNTS,
     "/users": SCREENS.USERS,
+    "/cargos": SCREENS.CARGOS,
+    "/notifications": SCREENS.NOTIFICATIONS,
+    "/reviews": SCREENS.REVIEWS,
+    "/triplogs": SCREENS.TRIPLOGS,
     "/reports": SCREENS.REPORT,
 
 }
